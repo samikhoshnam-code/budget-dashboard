@@ -7,36 +7,43 @@
 :root{--bg:#F4F6FA;--card:#fff;--ink:#1F2A44;--mut:#6B7694;--line:#D5DCE8;--nav:#0B4F8A;--kpi:#2F3A8F;--b:#1B4F8A;--o:#FF7F0E;--track:#E3E8F1;--q:#8FA3BF;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root{--bg:#0F1626;--card:#18213A;--ink:#E6EBF5;--mut:#9AA6C4;--line:#2B3656;--nav:#0B3A66;--b:#5B9BE0;--track:#26314F;--q:#6C7FA3}}
 [hidden]{display:none!important}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Tahoma,Vazirmatn,sans-serif}
-header{background:var(--nav);color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-header h1{margin:0;font-size:26px}header small{opacity:.85;display:block;font-size:13px}
-.tabs{display:flex;gap:10px;flex-wrap:wrap}.tabs button,.reset{font:inherit;font-size:15px;color:#fff;background:transparent;border:2px solid #fff;border-radius:16px;padding:8px 20px;cursor:pointer;font-weight:600}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Tahoma,Vazirmatn,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+header{flex:none;background:var(--nav);color:#fff;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header h1{margin:0;font-size:22px}header small{opacity:.85;display:block;font-size:12px}
+.tabs{display:flex;gap:10px}.tabs button{font:inherit;font-size:15px;color:#fff;background:transparent;border:2px solid #fff;border-radius:16px;padding:6px 20px;cursor:pointer;font-weight:600}
 .tabs button.on{background:#fff;color:var(--nav)}
-main{padding:18px 28px 32px;max-width:1500px;margin:auto}
-.filters{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
-.f{border:2px solid var(--b);border-radius:12px;padding:6px 12px;background:var(--card)}.f label{display:block;color:var(--b);font-weight:700;font-size:14px}
-.f select{border:0;background:transparent;color:var(--ink);font:inherit;min-width:190px}.f.chk{display:flex;gap:10px;align-items:center;font-weight:600}
-.reset{color:var(--b);border-color:var(--b);border-radius:12px;padding:12px 24px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:16px}
-.kpi{background:var(--kpi);color:#fff;border-radius:40px;padding:22px 12px;text-align:center}.kpi b{display:block;font-size:38px;line-height:1.2}.kpi span{font-size:15px;opacity:.92}.kpi.hot b{color:#FFB066}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.w2{grid-column:1/-1}
-.p{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;min-height:340px}.p h2{margin:0 0 12px;font-size:19px;text-align:center}
-.row{display:grid;grid-template-columns:190px 1fr 84px;gap:12px;align-items:center;margin:9px 0;cursor:pointer}.row.dim{opacity:.35}.row:hover .l{text-decoration:underline}
-.t{height:26px;background:var(--track);border-radius:6px;position:relative}.t i{position:absolute;right:0;border-radius:6px;top:0;height:100%}
-.bud{background:var(--mut);opacity:.45}.act{height:12px!important;top:7px!important;background:var(--b)}.act.over{background:var(--o)}
-.l,.v{font-size:15px}.v{text-align:left;font-variant-numeric:tabular-nums;font-weight:600}
-.leg{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:14px;color:var(--mut);margin-top:10px}.leg s{display:inline-block;width:14px;height:14px;border-radius:3px;margin-left:6px}
-.ins ul{padding:0;margin:0}.ins li{list-style:none;background:var(--bg);border-radius:8px;padding:12px 14px;margin:10px 0;color:var(--b);font-weight:600;font-size:16px}
-svg{display:block;width:100%;height:auto}svg text{fill:var(--mut);font-size:13px}svg .vl{fill:var(--ink);font-size:13px;font-weight:600}svg .ax{stroke:var(--line)}
-.note{color:var(--mut);font-size:13px;margin:12px 0;text-align:center}
-table{width:100%;border-collapse:collapse}th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;font-size:15px}th{color:var(--b)}
-.tag{background:var(--o);color:#fff;border-radius:8px;padding:2px 12px;font-size:13px}
+main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 24px 14px}
+.filters{flex:none;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.f{border:2px solid var(--b);border-radius:12px;padding:3px 12px;background:var(--card)}.f label{display:block;color:var(--b);font-weight:700;font-size:13px}
+.f select{border:0;background:transparent;color:var(--ink);font:inherit;min-width:180px}.f.chk{display:flex;gap:10px;align-items:center;font-weight:600;padding:9px 12px}
+.reset{font:inherit;color:var(--b);background:transparent;border:2px solid var(--b);border-radius:12px;padding:9px 20px;cursor:pointer;font-weight:600}
+.ghost{margin-inline-start:auto;font:inherit;font-size:13px;color:var(--mut);background:none;border:0;cursor:pointer;text-decoration:underline;padding:4px 8px}
+#view{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--kpi);color:#fff;border-radius:34px;padding:10px 8px;text-align:center}.kpi b{display:block;font-size:32px;line-height:1.25}.kpi span{font-size:14px;opacity:.92}.kpi.hot b{color:#FFB066}
+.g12{flex:1;min-height:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c8{grid-column:span 8}.c12{grid-column:1/-1}
+.p{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.p h2{flex:none;margin:0 0 6px;font-size:16px;text-align:center}.pb{flex:1;min-height:0;overflow:auto}
+.hb{display:flex;flex-direction:column;justify-content:space-evenly;height:100%}
+.row{display:grid;grid-template-columns:140px 1fr 62px;gap:10px;align-items:center;cursor:pointer}.row.dim{opacity:.35}.row:hover .l{text-decoration:underline}
+.t{height:20px;background:var(--track);border-radius:6px;position:relative}.t i{position:absolute;right:0;border-radius:6px;top:0;height:100%}
+.bud{background:var(--mut);opacity:.45}.act{height:10px!important;top:5px!important;background:var(--b)}.act.over{background:var(--o)}
+.l{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v{font-size:14px;text-align:left;font-variant-numeric:tabular-nums;font-weight:600}
+.leg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:4px;flex:none}.leg s{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:5px;text-decoration:none}
+.pb>svg{width:100%;height:100%}svg text{fill:var(--mut);font-size:12px}svg .vl{fill:var(--ink);font-size:12px;font-weight:600}svg .ax{stroke:var(--line)}
+.br{display:flex;justify-content:space-between;padding:3px 2px;border-bottom:1px solid var(--line);font-size:14px}.br b{font-variant-numeric:tabular-nums}.br.dim{opacity:.35}.neg{color:var(--o)}.br.tot{border-bottom:0;font-weight:700;color:var(--b);margin-top:2px}
+.dn{display:flex;align-items:center;gap:10px;height:100%}.dn svg{flex:0 0 46%;width:46%;height:auto;max-height:100%}.dl{flex:1;font-size:13px;line-height:1.75}.dl div{white-space:nowrap}.dl s{display:inline-block;width:11px;height:11px;border-radius:3px;margin-left:6px;text-decoration:none}.dl b{float:left}
+.ins{display:flex;flex-direction:column;justify-content:space-evenly;height:100%}.ins div{background:var(--bg);border-radius:8px;padding:8px 12px;color:var(--b);font-weight:600;font-size:14px}
+.note{color:var(--mut);font-size:13px;margin:8px 0;text-align:center}
+table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}th{color:var(--b)}
 #login{position:fixed;inset:0;background:var(--nav);display:flex;align-items:center;justify-content:center;z-index:9}
 #login form{background:var(--card);padding:34px;border-radius:16px;width:min(400px,90vw);text-align:center}
 #login input{width:100%;padding:12px;margin:14px 0;border:2px solid var(--b);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
 #login button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--kpi);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 #err{color:#C0392B;min-height:20px}
-@media(max-width:1000px){.grid{grid-template-columns:1fr}.row{grid-template-columns:130px 1fr 70px}}
+@media(max-height:800px),(max-width:1100px){body{height:auto;overflow:auto}main{display:block}#view{display:block}.g12{display:block}.p{min-height:300px;margin-top:12px}.kpis{margin-bottom:4px}.row{grid-template-columns:120px 1fr 60px}}
 </style></head><body>
 <div id="login"><form id="lf"><h2 style="margin:0">داشبورد مدیریتی</h2><p class="note">برای دیدن داده‌ها رمز را وارد کنید.</p>
 <input type="password" id="pw" autocomplete="current-password" placeholder="رمز عبور" aria-label="رمز عبور"><div id="err" role="alert"></div><button>ورود</button></form></div>
@@ -45,13 +52,13 @@ table{width:100%;border-collapse:collapse}th,td{padding:10px 12px;border-bottom:
 <div class="filters" id="flt">
 <div class="f"><label for="mon">ماه</label><select id="mon"></select></div>
 <div class="f"><label for="cat">دسته</label><select id="cat"></select></div>
-<div class="f chk"><input type="checkbox" id="over" style="width:18px;height:18px"><label for="over" style="color:var(--ink);font-size:15px">فقط بالاتر از بودجه</label></div>
-<button class="reset" id="rs">پاک‌کردن فیلترها</button></div>
+<div class="f chk"><input type="checkbox" id="over" style="width:18px;height:18px"><label for="over" style="color:var(--ink)">فقط بالاتر از بودجه</label></div>
+<button class="reset" id="rs">پاک‌کردن فیلترها</button><button class="ghost" id="rvbtn"></button></div>
 <div id="view"></div></main>
 <script>
 const $=s=>document.getElementById(s),f=(n,d=1)=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d});
 const COL=['#1B4F8A','#FF7F0E','#3B3F9E','#0F8BFF','#6A0F7A','#E5703A','#2E9E8F','#8FA3BF','#C0392B','#F2B134'];
-const TABS=[['ov','بودجه'],['rv','اقلام نیازمند تایید'],['sl','فروش'],['pr','تولید']];
+const TABS=[['ov','شرح بودجه'],['pr','تولید'],['sl','فروش']];
 let D,sel='',over=false,tab='ov',mk='';
 async function dec(pw){const e=await (await fetch('data.enc?'+Date.now())).json(),b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
@@ -67,70 +74,70 @@ function init(){$('upd').textContent='آخرین تراکنش: '+D.lastTx+' | ب
  $('tabs').innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}</button>`).join('');
  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
  $('over').onchange=e=>{over=e.target.checked;draw()};$('cat').onchange=()=>{sel=$('cat').value;draw()};
- $('rs').onclick=()=>{sel='';over=false;$('over').checked=false;draw()};draw()}
+ $('rs').onclick=()=>{sel='';over=false;$('over').checked=false;draw()};$('rvbtn').onclick=()=>{tab='rv';draw()};draw()}
 const kp=(b,s,h)=>`<div class="kpi ${h?'hot':''}"><b>${b}</b><span>${s}</span></div>`;
 const leg=a=>`<div class="leg">${a.map(x=>`<span><s style="background:${x[1]}"></s>${x[0]}</span>`).join('')}</div>`;
-const wrap=(s,n=11)=>{const w=s.split(' '),L=[''];w.forEach(x=>{if((L[L.length-1]+' '+x).trim().length>n&&L[L.length-1])L.push(x);else L[L.length-1]=(L[L.length-1]+' '+x).trim()});return L};
-// نمودار ستونی عمودی: series=[{n,c,v:[...],cc:[رنگ هر ستون، اختیاری]}], stacked برای انباشته
-function vchart(labels,series,o={}){const W=1000,H=o.h||430,pl=20,pr=20,pt=34,pb=78,n=labels.length,gw=(W-pl-pr)/Math.max(n,1),ns=series.length;
+const P=(h,inner,cls,foot)=>`<section class="p ${cls||''}"><h2>${h}</h2><div class="pb">${inner}</div>${foot||''}</section>`;
+const wrap=(s,n=10)=>{const w=s.split(' '),L=[''];w.forEach(x=>{if((L[L.length-1]+' '+x).trim().length>n&&L[L.length-1])L.push(x);else L[L.length-1]=(L[L.length-1]+' '+x).trim()});return L};
+function vchart(labels,series,o={}){const W=o.W||900,H=o.H||300,pl=10,pr=10,pt=24,pb=o.pb||64,n=labels.length,gw=(W-pl-pr)/Math.max(n,1),ns=series.length;
  const tot=labels.map((_,i)=>o.stacked?series.reduce((s,x)=>s+(x.v[i]||0),0):Math.max(...series.map(x=>x.v[i]||0)));
- const mx=Math.max(...tot,1)*1.12,y=v=>pt+(H-pt-pb)*(1-v/mx),bw=o.stacked?gw*.6:gw*.7/ns;let s=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
- for(let k=0;k<=4;k++){const yy=pt+(H-pt-pb)*k/4;s+=`<line class="ax" x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}"/><text x="${W-pr}" y="${yy-4}" text-anchor="end">${f(mx*(1-k/4),0)}</text>`}
+ const mx=Math.max(...tot,1)*1.12,y=v=>pt+(H-pt-pb)*(1-v/mx),bw=o.stacked?gw*.6:gw*.72/ns;let s=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+ for(let k=0;k<=3;k++){const yy=pt+(H-pt-pb)*k/3;s+=`<line class="ax" x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}"/><text x="${W-pr}" y="${yy-3}" text-anchor="end">${f(mx*(1-k/3),0)}</text>`}
  labels.forEach((lb,i)=>{const cx=W-pr-(i+.5)*gw;let base=0;
   series.forEach((sr,j)=>{const v=sr.v[i]||0,x=o.stacked?cx-bw/2:cx-ns*bw/2+(ns-1-j)*bw,y0=o.stacked?y(base+v):y(v),hh=o.stacked?y(base)-y(base+v):y(0)-y(v);
-   s+=`<rect x="${x}" y="${y0}" width="${bw}" height="${Math.max(hh,0)}" rx="4" style="fill:${(sr.cc&&sr.cc[i])||sr.c}"><title>${lb} – ${sr.n}: ${f(v,1)}</title></rect>`;
-   if(!o.stacked&&v>0)s+=`<text class="vl" x="${x+bw/2}" y="${y0-6}" text-anchor="middle">${f(v,0)}</text>`;base+=v});
-  if(o.stacked&&tot[i]>0)s+=`<text class="vl" x="${cx}" y="${y(tot[i])-6}" text-anchor="middle">${f(tot[i],0)}</text>`;
-  wrap(lb).forEach((ln,k)=>s+=`<text x="${cx}" y="${H-pb+22+k*17}" text-anchor="middle" style="fill:var(--ink)">${ln}</text>`)});
+   s+=`<rect x="${x}" y="${y0}" width="${bw}" height="${Math.max(hh,0)}" rx="3" style="fill:${(sr.cc&&sr.cc[i])||sr.c}"><title>${lb} – ${sr.n}: ${f(v,1)}</title></rect>`;
+   if(!o.stacked)s+=`<text class="vl" x="${x+bw/2}" y="${y0-4}" text-anchor="middle">${f(v,0)}</text>`;base+=v});
+  if(o.stacked&&tot[i]>0)s+=`<text class="vl" x="${cx}" y="${y(tot[i])-4}" text-anchor="middle">${f(tot[i],0)}</text>`;
+  wrap(lb,o.wn||10).forEach((ln,k)=>s+=`<text x="${cx}" y="${H-pb+16+k*14}" text-anchor="middle" style="fill:var(--ink)">${ln}</text>`)});
  return s+'</svg>'}
 function donut(items,tot,selK){let off=0;const R=70,C=2*Math.PI*R;
  const a=items.map((c,i)=>{const l=c.v/tot*C,s=`<circle r="${R}" cx="110" cy="110" fill="none" stroke="${COL[i%10]}" stroke-width="${selK==c.k?36:28}" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)" opacity="${selK&&selK!=c.k?.3:1}"/>`;off+=l;return s}).join('');
- return `<svg viewBox="0 0 220 220" style="max-width:300px;margin:auto">${a}<text x="110" y="108" text-anchor="middle" style="font-size:24px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="110" y="130" text-anchor="middle" style="font-size:13px">جمع</text></svg>`+leg(items.map((c,i)=>[`${c.k} ${f(c.v/tot*100,0)}٪`,COL[i%10]]))}
+ return `<div class="dn"><svg viewBox="0 0 220 220">${a}<text x="110" y="110" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="110" y="132" text-anchor="middle" style="font-size:13px">جمع</text></svg><div class="dl">${items.map((c,i)=>`<div><s style="background:${COL[i%10]}"></s>${c.k}<b>${f(c.v/tot*100,0)}٪</b></div>`).join('')}</div></div>`}
 function draw(){const M=D.months[mk],all=M.cats;
  document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.t==tab?'on':'');
- $('flt').hidden=(tab=='sl'||tab=='pr');
+ $('flt').hidden=(tab=='sl'||tab=='pr');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
  $('cat').innerHTML='<option value="">همه دسته‌ها</option>'+all.map(c=>`<option>${c.k}</option>`).join('');$('cat').value=sel;
  if(tab=='rv')return review(M);if(tab=='sl')return sales();if(tab=='pr')return prodTab();
  const vis=all.filter(c=>!over||c.x>c.a),use=sel?all.filter(c=>c.k==sel):vis;
- const A=use.reduce((s,c)=>s+c.a,0),Q=use.reduce((s,c)=>s+(c.q||0),0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,tot=all.reduce((s,c)=>s+c.x,0)||1;
+ const A=use.reduce((s,c)=>s+c.a,0),Q=use.reduce((s,c)=>s+(c.q||0),0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,R=use.reduce((s,c)=>s+(c.p||0)+c.a-c.x,0),tot=all.reduce((s,c)=>s+c.x,0)||1;
  const mx=Math.max(...vis.map(c=>Math.max(c.a,c.x)),1);
  const bars=vis.map(c=>`<div class="row ${sel&&sel!=c.k?'dim':''}" data-k="${c.k}"><span class="l">${c.k}</span><div class="t"><i class="bud" style="width:${c.a/mx*100}%"></i><i class="act ${c.x>c.a?'over':''}" style="width:${c.x/mx*100}%"></i></div><span class="v">${f(c.x)}</span></div>`).join('')||'<p class="note">دسته‌ای بالاتر از بودجه نیست.</p>';
- const vq=vis.filter(c=>(c.q||0)>0||c.x>0);
- const vert=vchart(vq.map(c=>c.k),[{n:'درخواستی',c:'var(--q)',v:vq.map(c=>c.q||0)},{n:'جذب شده',c:'var(--b)',v:vq.map(c=>c.x),cc:vq.map(c=>c.x>(c.q||0)?'#FF7F0E':null)}]);
+ const vert=vchart(all.map(c=>c.k),[{n:'درخواستی',c:'var(--q)',v:all.map(c=>c.q||0)},{n:'جذب شده',c:'var(--b)',v:all.map(c=>c.x),cc:all.map(c=>c.x>(c.q||0)?'#FF7F0E':null)}],{W:760,H:300,pb:58,wn:9});
+ const rem=all.map(c=>[c.k,(c.p||0)+c.a-c.x]),RT=rem.reduce((s,x)=>s+x[1],0);
+ const balp=rem.map(x=>`<div class="br ${sel&&sel!=x[0]?'dim':''}"><span>${x[0]}</span><b class="${x[1]<0?'neg':''}">${f(x[1])}</b></div>`).join('')+`<div class="br tot"><span>جمع مانده بودجه</span><b class="${RT<0?'neg':''}">${f(RT)}</b></div>`;
  const tp=M.top.map(([n,m])=>[n,sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,7),tm=Math.max(...tp.map(x=>x[1]),1);
  const days=Object.keys(M.daily).map(Number),ld=days.length?Math.max(...days):1;let cum=0,pts=[];
  for(let d=1;d<=ld;d++){const m=M.daily[d]||{};cum+=sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0);pts.push(cum)}
- const tq=Math.max(cum,A,1)*1.08,xs=i=>20+i*(600/29),ys=v=>230-v/tq*210;
+ const tq=Math.max(cum,A,1)*1.08,xs=i=>14+i*(420/29),ys=v=>212-v/tq*190;
  const big=[...all].sort((a,b)=>b.x-a.x)[0],ov=[...all].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0],pa=all.filter(c=>c.a>0).sort((a,b)=>a.x/a.a-b.x/b.a)[0];
- $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp((V>0?'+':'')+f(V),'انحراف از تخصیص',V>0)}${kp(A?f(X/A*100)+'٪':'—','درصد مصرف')}${kp(f(M.rev,0),'قلم نیازمند تایید')}</div>
- <div class="grid"><section class="p w2"><h2>بودجه در برابر عملکرد (میلیارد ریال)</h2>${bars}${leg([['تخصیص','var(--q)'],['عملکرد','var(--b)'],['بالاتر از بودجه','var(--o)']])}</section>
- <section class="p w2"><h2>مقایسه بودجه درخواستی و جذب‌شده (میلیارد ریال)</h2>${vert}${leg([['درخواستی','var(--q)'],['جذب شده','var(--b)'],['جذب‌شده بالاتر از درخواستی','var(--o)']])}</section>
- <section class="p"><h2>سهم دسته‌ها از کل جذب</h2>${donut(all.map(c=>({k:c.k,v:c.x})),tot,sel)}</section>
- <section class="p"><h2>طرف‌حساب‌های برتر</h2>${tp.map((x,i)=>`<div class="row" style="cursor:default;grid-template-columns:200px 1fr 84px"><span class="l">${x[0]}</span><div class="t"><i class="act ${i==0?'over':''}" style="width:${x[1]/tm*100}%;height:100%!important;top:0!important"></i></div><span class="v">${f(x[1])}</span></div>`).join('')||'<p class="note">داده‌ای نیست.</p>'}</section>
- <section class="p"><h2>روند تجمعی روزانه در برابر تخصیص</h2><svg viewBox="0 0 640 270"><line class="ax" x1="20" x2="620" y1="${ys(A)}" y2="${ys(A)}" stroke-dasharray="6 4" style="stroke:var(--o)"/><text x="24" y="${ys(A)-6}">تخصیص ${f(A,0)}</text><polyline fill="none" style="stroke:var(--b)" stroke-width="3.5" points="${pts.map((v,i)=>xs(i)+','+ys(v)).join(' ')}"/><text x="20" y="262">۱</text><text x="310" y="262">۱۵</text><text x="600" y="262">۳۰</text></svg></section>
- <section class="p ins"><h2>نکات کلیدی</h2><ul><li>بیشترین مصرف: ${big.k} (${f(big.x/tot*100,0)}٪ از کل)</li><li>بیشترین اضافه‌مصرف: ${ov.k} (${f(ov.x-ov.a)} میلیارد)</li>${pa?`<li>کم‌مصرف‌ترین نسبت به تخصیص: ${pa.k} (${f(pa.x/pa.a*100,0)}٪)</li>`:''}<li>جذب‌شده نسبت به درخواستی: ${Q?f(X/Q*100)+'٪':'—'}</li></ul></section></div>`;
+ $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp((V>0?'+':'')+f(V),'انحراف از تخصیص',V>0)}${kp(A?f(X/A*100)+'٪':'—','درصد مصرف')}${kp(f(R),'مانده بودجه',R<0)}${kp(M.bal!=null?f(M.bal):'—','مانده حساب بانکی'+(M.lastDate?' تا '+M.lastDate:''))}</div>
+ <div class="g12">${P('بودجه در برابر عملکرد (میلیارد ریال)',`<div class="hb">${bars}</div>`,'c4',leg([['تخصیص','var(--q)'],['عملکرد','var(--b)'],['بالاتر از بودجه','var(--o)']]))}
+ ${P('مقایسه بودجه درخواستی و جذب‌شده (میلیارد ریال)',vert,'c5',leg([['درخواستی','var(--q)'],['جذب شده','var(--b)'],['جذب‌شده بالاتر از درخواستی','var(--o)']]))}
+ ${P('مانده بودجه هر دسته (میلیارد ریال)',balp,'c3')}
+ ${P('سهم دسته‌ها از کل جذب',donut(all.map(c=>({k:c.k,v:c.x})),tot,sel),'c3')}
+ ${P('طرف‌حساب‌های برتر',`<div class="hb">${tp.map((x,i)=>`<div class="row" style="cursor:default;grid-template-columns:140px 1fr 56px"><span class="l" title="${x[0]}">${x[0]}</span><div class="t"><i class="act ${i==0?'over':''}" style="width:${x[1]/tm*100}%;height:100%!important;top:0!important"></i></div><span class="v">${f(x[1])}</span></div>`).join('')||'<p class="note">داده‌ای نیست.</p>'}</div>`,'c3')}
+ ${P('روند تجمعی روزانه در برابر تخصیص',`<svg viewBox="0 0 450 250"><line class="ax" x1="14" x2="434" y1="${ys(A)}" y2="${ys(A)}" stroke-dasharray="6 4" style="stroke:var(--o)"/><text x="18" y="${ys(A)-5}">تخصیص ${f(A,0)}</text><polyline fill="none" style="stroke:var(--b)" stroke-width="3" points="${pts.map((v,i)=>xs(i)+','+ys(v)).join(' ')}"/><text x="14" y="244">۱</text><text x="214" y="244">۱۵</text><text x="424" y="244">۳۰</text></svg>`,'c3')}
+ ${P('نکات کلیدی',`<div class="ins"><div>بیشترین مصرف: ${big.k} (${f(big.x/tot*100,0)}٪ از کل)</div><div>بیشترین اضافه‌مصرف: ${ov.k} (${f(ov.x-ov.a)} میلیارد)</div>${pa?`<div>کم‌مصرف‌ترین نسبت به تخصیص: ${pa.k} (${f(pa.x/pa.a*100,0)}٪)</div>`:''}<div>جذب‌شده نسبت به درخواستی: ${Q?f(X/Q*100)+'٪':'—'}</div></div>`,'c3')}</div>`;
  document.querySelectorAll('.row[data-k]').forEach(r=>r.onclick=()=>{sel=sel==r.dataset.k?'':r.dataset.k;draw()})}
-function review(M){$('view').innerHTML=`<div class="kpis">${kp(f(M.rev,0),'قلم نیازمند تایید')}${kp(f(M.revamt),'مبلغ این اقلام (میلیارد ریال)',1)}${kp(f(M.n,0),'کل ردیف‌های پرداخت')}</div><section class="p w2" style="grid-column:auto"><h2>اقلامی که دسته‌شان باید تایید شود</h2><div style="overflow-x:auto"><table><tr><th>تاریخ</th><th>طرف مقابل</th><th>شرح</th><th>مبلغ (میلیارد)</th><th>دسته فعلی</th></tr>${M.rvList.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${f(r[3],2)}</td><td>${r[4]}</td></tr>`).join('')||'<tr><td colspan="5">همه اقلام قطعی هستند.</td></tr>'}</table></div></section>`}
-function noProd(){$('view').innerHTML='<section class="p"><h2>داده تولید و فروش پیدا نشد</h2><p class="note">فایل «میزان تولیدات ماهیانه» را در پوشه input بگذارید و update.bat را اجرا کنید.</p></section>'}
+function review(M){$('view').innerHTML=`<div class="kpis">${kp(f(M.rev,0),'قلم نیازمند تایید')}${kp(f(M.revamt),'مبلغ این اقلام (میلیارد ریال)',1)}${kp(f(M.n,0),'کل ردیف‌های پرداخت')}</div><section class="p" style="flex:1"><h2>اقلامی که دسته‌شان باید تایید شود <button class="ghost" id="bk" style="margin:0 12px">بازگشت به شرح بودجه</button></h2><div class="pb"><table><tr><th>تاریخ</th><th>طرف مقابل</th><th>شرح</th><th>مبلغ (میلیارد)</th><th>دسته فعلی</th></tr>${M.rvList.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${f(r[3],2)}</td><td>${r[4]}</td></tr>`).join('')||'<tr><td colspan="5">همه اقلام قطعی هستند.</td></tr>'}</table></div></section>`;$('bk').onclick=()=>{tab='ov';draw()}}
+function noProd(){$('view').innerHTML='<section class="p" style="flex:1"><h2>داده تولید و فروش پیدا نشد</h2><p class="note">فایل «میزان تولیدات ماهیانه» را در پوشه input بگذارید و update.bat را اجرا کنید.</p></section>'}
 const PS=['ورق 8-150','ضایعات سرورق','ضایعات پوسته','اسلب (تختال)','ورق 8-15 (کارمزدی)','پوسته (کارمزدی)'];
 const sm=o=>Object.values(o).reduce((a,b)=>a+b,0);
-function sales(){const P=D.prod;if(!P)return noProd();const ms=P.months.filter(m=>m.has);if(!ms.length)return noProd();
+function sales(){const Pd=D.prod;if(!Pd)return noProd();const ms=Pd.months.filter(m=>m.has);if(!ms.length)return noProd();
  const tq={},tv={};PS.forEach(p=>{tq[p]=ms.reduce((s,m)=>s+m.sales[p][0],0);tv[p]=ms.reduce((s,m)=>s+m.sales[p][1],0)});
  const Q=sm(tq),Vt=sm(tv),items=PS.map(p=>({k:p,v:tv[p]})).filter(x=>x.v>0),top=[...items].sort((a,b)=>b.v-a.v)[0];
  const series=PS.map((p,i)=>({n:p,c:COL[i],v:ms.map(m=>m.sales[p][1])})).filter(s=>s.v.some(x=>x>0));
  $('view').innerHTML=`<div class="kpis">${kp(f(Q,0),'کل فروش (تن)')}${kp(f(Vt,0),'مبلغ فروش (میلیارد ریال)')}${kp(f(Vt/Q*1000,0),'میانگین قیمت (میلیون ریال/تن)')}${kp(top.k,'محصول اصلی فروش (از نظر مبلغ)')}</div>
- <div class="grid"><section class="p w2"><h2>مبلغ فروش ماهانه به تفکیک محصول (میلیارد ریال)</h2>${vchart(ms.map(m=>m.name),series,{stacked:true})}${leg(series.map(s=>[s.n,s.c]))}</section>
- <section class="p"><h2>سهم محصولات از مبلغ فروش</h2>${donut(items,Vt)}</section>
- <section class="p"><h2>جدول فروش به تفکیک محصول</h2><div style="overflow-x:auto"><table><tr><th>محصول</th><th>تن</th><th>میلیارد ریال</th><th>قیمت (م.ر/تن)</th></tr>${PS.filter(p=>tq[p]>0).map(p=>`<tr><td>${p}</td><td>${f(tq[p],0)}</td><td>${f(tv[p],0)}</td><td>${f(tv[p]/tq[p]*1000,0)}</td></tr>`).join('')}<tr><th>جمع</th><th>${f(Q,0)}</th><th>${f(Vt,0)}</th><th>${f(Vt/Q*1000,0)}</th></tr></table></div></section></div>
- <p class="note">داده تا ${ms[ms.length-1].name} ۱۴۰۵. طبقه‌بندی ریزتر محصولات بعداً با داده تفکیکی اضافه می‌شود.</p>`}
-function prodTab(){const P=D.prod;if(!P)return noProd();const ms=P.months.filter(m=>m.has);if(!ms.length)return noProd();
+ <div class="g12">${P('مبلغ فروش ماهانه به تفکیک محصول (میلیارد ریال)',vchart(ms.map(m=>m.name),series,{stacked:true,W:1000,H:300,pb:36}),'c8',leg(series.map(s=>[s.n,s.c])))}
+ ${P('سهم محصولات از مبلغ فروش',donut(items,Vt),'c4')}
+ ${P('جدول فروش به تفکیک محصول (تا '+ms[ms.length-1].name+' ۱۴۰۵)',`<table><tr><th>محصول</th><th>تن</th><th>میلیارد ریال</th><th>قیمت (م.ر/تن)</th><th>سهم</th></tr>${PS.filter(p=>tq[p]>0).map(p=>`<tr><td>${p}</td><td>${f(tq[p],0)}</td><td>${f(tv[p],0)}</td><td>${f(tv[p]/tq[p]*1000,0)}</td><td>${f(tv[p]/Vt*100,0)}٪</td></tr>`).join('')}<tr><th>جمع</th><th>${f(Q,0)}</th><th>${f(Vt,0)}</th><th>${f(Vt/Q*1000,0)}</th><th></th></tr></table>`,'c12')}</div>`}
+function prodTab(){const Pd=D.prod;if(!Pd)return noProd();const ms=Pd.months.filter(m=>m.has);if(!ms.length)return noProd();
  const pc=ms.map(m=>sm(m.pc)),pf=ms.map(m=>sm(m.pf)),sq=ms.map(m=>PS.reduce((s,p)=>s+m.sales[p][0],0));
  const TC=pc.reduce((a,b)=>a+b,0),TF=pf.reduce((a,b)=>a+b,0),TS=sq.reduce((a,b)=>a+b,0);
  const mix={};ms.forEach(m=>{Object.entries(m.pc).forEach(([k,v])=>mix[k]=(mix[k]||0)+v)});const items=Object.entries(mix).filter(x=>x[1]>0).map(([k,v])=>({k,v}));
  const raw=ms.filter(m=>m.raw[0]||m.raw[1]);
  $('view').innerHTML=`<div class="kpis">${kp(f(TC,0),'تولید شرکتی (تن)')}${kp(f(TF,0),'تولید کارمزدی (تن)')}${kp(f(TS,0),'فروش کل (تن)')}${kp(TC+TF?f(TS/(TC+TF)*100,0)+'٪':'—','فروش نسبت به تولید')}</div>
- <div class="grid"><section class="p w2"><h2>تولید و فروش ماهانه (تن)</h2>${vchart(ms.map(m=>m.name),[{n:'تولید',c:'var(--b)',v:pc.map((x,i)=>x+pf[i])},{n:'فروش',c:'var(--o)',v:sq}])}${leg([['تولید (شرکتی و کارمزدی)','var(--b)'],['فروش','var(--o)']])}</section>
- <section class="p"><h2>ترکیب تولید شرکتی (تن)</h2>${donut(items,TC)}</section>
- <section class="p"><h2>مواد اولیه (اسلب): رسید انبار و فاکتور</h2><div style="overflow-x:auto"><table><tr><th>ماه</th><th>رسید انبار (تن)</th><th>فاکتور (تن)</th><th>فی (م.ر/تن)</th></tr>${raw.map(m=>`<tr><td>${m.name}</td><td>${f(m.raw[0],0)}</td><td>${f(m.raw[1],0)}</td><td>${m.raw[3]?f(m.raw[3],0):'—'}</td></tr>`).join('')||'<tr><td colspan="4">داده‌ای نیست.</td></tr>'}</table></div></section></div>
- <p class="note">داده تا ${ms[ms.length-1].name} ۱۴۰۵.</p>`}
+ <div class="g12">${P('تولید و فروش ماهانه (تن)',vchart(ms.map(m=>m.name),[{n:'تولید',c:'var(--b)',v:pc.map((x,i)=>x+pf[i])},{n:'فروش',c:'var(--o)',v:sq}],{W:1000,H:300,pb:36}),'c8',leg([['تولید (شرکتی و کارمزدی)','var(--b)'],['فروش','var(--o)']]))}
+ ${P('ترکیب تولید شرکتی (تن)',donut(items,TC),'c4')}
+ ${P('مواد اولیه (اسلب): رسید انبار و فاکتور – تا '+ms[ms.length-1].name+' ۱۴۰۵',`<table><tr><th>ماه</th><th>رسید انبار (تن)</th><th>فاکتور (تن)</th><th>فی (م.ر/تن)</th></tr>${raw.map(m=>`<tr><td>${m.name}</td><td>${f(m.raw[0],0)}</td><td>${f(m.raw[1],0)}</td><td>${m.raw[3]?f(m.raw[3],0):'—'}</td></tr>`).join('')||'<tr><td colspan="4">داده‌ای نیست.</td></tr>'}</table>`,'c12')}</div>`}
 </script></body></html>
