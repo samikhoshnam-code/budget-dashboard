@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>داشبورد مدیریتی بودجه و عملکرد</title>
+<style>
+:root{--bg:#F4F6FA;--card:#fff;--ink:#1F2A44;--mut:#6B7694;--line:#D5DCE8;--nav:#0B4F8A;--kpi:#2F3A8F;--b:#1B4F8A;--o:#FF7F0E;--track:#E3E8F1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1626;--card:#18213A;--ink:#E6EBF5;--mut:#9AA6C4;--line:#2B3656;--nav:#0B3A66;--b:#5B9BE0;--track:#26314F}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 "Segoe UI",Tahoma,Vazirmatn,sans-serif}
+header{background:var(--nav);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header h1{margin:0;font-size:21px}header small{opacity:.85;display:block;font-size:11px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button,.reset{font:inherit;color:#fff;background:transparent;border:1.5px solid #fff;border-radius:14px;padding:6px 16px;cursor:pointer;font-weight:600}
+.tabs button.on{background:#fff;color:var(--nav)}
+main{padding:14px 22px 24px;max-width:1280px;margin:auto}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.f{border:1.5px solid var(--b);border-radius:10px;padding:5px 10px;background:var(--card)}.f label{display:block;color:var(--b);font-weight:700;font-size:12px}
+.f select{border:0;background:transparent;color:var(--ink);font:inherit;min-width:160px}.f.chk{display:flex;gap:8px;align-items:center;font-weight:600}
+.reset{color:var(--b);border-color:var(--b);border-radius:10px;padding:10px 20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:12px}
+.kpi{background:var(--kpi);color:#fff;border-radius:34px;padding:16px 10px;text-align:center}.kpi b{display:block;font-size:30px;line-height:1.2}.kpi span{font-size:12px;opacity:.9}.kpi.hot b{color:#FFB066}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.w2{grid-column:span 2}.w3{grid-column:1/-1}
+.p{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:250px}.p h2{margin:0 0 8px;font-size:14px;text-align:center}
+.row{display:grid;grid-template-columns:128px 1fr 62px;gap:8px;align-items:center;margin:5px 0;cursor:pointer}.row.dim{opacity:.35}.row:hover .l{text-decoration:underline}
+.t{height:16px;background:var(--track);border-radius:4px;position:relative}.t i{position:absolute;right:0;border-radius:4px;top:0;height:100%}
+.bud{background:var(--mut);opacity:.45}.act{height:8px!important;top:4px!important;background:var(--b)}.act.over{background:var(--o)}
+.l,.v{font-size:12px}.v{text-align:left;font-variant-numeric:tabular-nums}
+.leg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--mut);margin-top:6px}.leg s{display:inline-block;width:10px;height:10px;border-radius:2px;margin-left:4px}
+.ins ul{padding:0;margin:0}.ins li{list-style:none;background:var(--bg);border-radius:6px;padding:8px 10px;margin:6px 0;color:var(--b);font-weight:600}
+svg text{fill:var(--mut);font-size:10px}.note{color:var(--mut);font-size:11px;margin:10px 0;text-align:center}
+table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:12px}th{color:var(--b)}
+.tag{background:var(--o);color:#fff;border-radius:8px;padding:2px 10px;font-size:11px}
+#login{position:fixed;inset:0;background:var(--nav);display:flex;align-items:center;justify-content:center;z-index:9}
+#login form{background:var(--card);padding:28px;border-radius:14px;width:min(360px,90vw);text-align:center}
+#login input{width:100%;padding:10px;margin:12px 0;border:1.5px solid var(--b);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+#login button{width:100%;padding:10px;border:0;border-radius:8px;background:var(--kpi);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+#err{color:#C0392B;min-height:18px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.w2,.w3{grid-column:auto}}
+</style></head><body>
+<div id="login"><form id="lf"><h2 style="margin:0">داشبورد مدیریتی</h2><p class="note">برای دیدن داده‌ها رمز را وارد کنید.</p>
+<input type="password" id="pw" autocomplete="current-password" placeholder="رمز عبور" aria-label="رمز عبور"><div id="err" role="alert"></div><button>ورود</button></form></div>
+<header><div><h1>داشبورد بودجه و عملکرد</h1><small id="upd"></small></div><div class="tabs" id="tabs"></div></header>
+<main id="app" hidden>
+<div class="filters">
+<div class="f"><label for="mon">ماه</label><select id="mon"></select></div>
+<div class="f"><label for="cat">دسته</label><select id="cat"></select></div>
+<div class="f chk"><input type="checkbox" id="over"><label for="over" style="color:var(--ink)">فقط بالاتر از بودجه</label></div>
+<button class="reset" id="rs">پاک‌کردن فیلترها</button></div>
+<div id="view"></div></main>
+<script>
+const $=s=>document.getElementById(s),f=(n,d=1)=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d});
+const COL=['#1B4F8A','#FF7F0E','#3B3F9E','#0F8BFF','#6A0F7A','#E5703A','#2E9E8F','#8FA3BF','#C0392B','#F2B134'];
+const TABS=[['ov','نمای کلی'],['rv','اقلام نیازمند تایید'],['sl','فروش'],['pr','تولید']];
+let D,sel='',over=false,tab='ov',mk='';
+async function dec(pw){const e=await (await fetch('data.enc?'+Date.now())).json(),b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+ const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+ const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b(e.s),iterations:e.it,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b(e.i)},k,b(e.c))))}
+async function open_(pw){try{D=await dec(pw);sessionStorage.setItem('k',pw)}catch(x){sessionStorage.removeItem('k');$('err').textContent='رمز نادرست است یا داده در دسترس نیست.';return}
+ $('login').hidden=true;$('app').hidden=false;init()}
+$('lf').onsubmit=e=>{e.preventDefault();open_($('pw').value)};
+const sk=sessionStorage.getItem('k');if(sk)open_(sk);
+function init(){$('upd').textContent='آخرین تراکنش: '+D.lastTx+' | به‌روزرسانی: '+D.updated;
+ mk=D.order[D.order.length-1];$('mon').innerHTML=D.order.map(m=>`<option value="${m}">${D.months[m].label}</option>`).join('');$('mon').value=mk;
+ $('mon').onchange=()=>{mk=$('mon').value;sel='';draw()};
+ $('tabs').innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}</button>`).join('');
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
+ $('over').onchange=e=>{over=e.target.checked;draw()};$('cat').onchange=()=>{sel=$('cat').value;draw()};
+ $('rs').onclick=()=>{sel='';over=false;$('over').checked=false;draw()};draw()}
+const kp=(b,s,h)=>`<div class="kpi ${h?'hot':''}"><b>${b}</b><span>${s}</span></div>`;
+function draw(){const M=D.months[mk],all=M.cats;
+ document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.t==tab?'on':'');
+ $('cat').innerHTML='<option value="">همه دسته‌ها</option>'+all.map(c=>`<option>${c.k}</option>`).join('');$('cat').value=sel;
+ if(tab=='rv')return review(M);if(tab=='sl'||tab=='pr')return sample();
+ const vis=all.filter(c=>!over||c.x>c.a),use=sel?all.filter(c=>c.k==sel):vis;
+ const A=use.reduce((s,c)=>s+c.a,0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,tot=all.reduce((s,c)=>s+c.x,0)||1;
+ const mx=Math.max(...vis.map(c=>Math.max(c.a,c.x)),1);
+ const bars=vis.map(c=>`<div class="row ${sel&&sel!=c.k?'dim':''}" data-k="${c.k}"><span class="l">${c.k}</span><div class="t"><i class="bud" style="width:${c.a/mx*100}%"></i><i class="act ${c.x>c.a?'over':''}" style="width:${c.x/mx*100}%"></i></div><span class="v">${f(c.x)}</span></div>`).join('')||'<p class="note">دسته‌ای بالاتر از بودجه نیست.</p>';
+ let off=0;const R=62,C=2*Math.PI*R,arcs=all.map((c,i)=>{const l=c.x/tot*C,s=`<circle r="${R}" cx="90" cy="90" fill="none" stroke="${COL[i]}" stroke-width="${sel==c.k?30:22}" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 90 90)" opacity="${sel&&sel!=c.k?.3:1}"/>`;off+=l;return s}).join('');
+ const tp=M.top.map(([n,m])=>[n,sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,6),tm=Math.max(...tp.map(x=>x[1]),1);
+ const days=Object.keys(M.daily).map(Number),ld=days.length?Math.max(...days):1;let cum=0,pts=[];
+ for(let d=1;d<=ld;d++){const m=M.daily[d]||{};cum+=sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0);pts.push(cum)}
+ const tq=Math.max(cum,A,1)*1.05,xs=i=>10+i*(280/29),ys=v=>130-v/tq*120;
+ const big=[...all].sort((a,b)=>b.x-a.x)[0],ov=[...all].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0],pa=all.filter(c=>c.a>0).sort((a,b)=>a.x/a.a-b.x/b.a)[0];
+ $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp((V>0?'+':'')+f(V),'انحراف از تخصیص',V>0)}${kp(A?f(X/A*100)+'٪':'—','درصد مصرف')}${kp(f(M.rev,0),'قلم نیازمند تایید')}</div>
+ <div class="grid"><section class="p w2"><h2>بودجه در برابر عملکرد (میلیارد ریال)</h2>${bars}<div class="leg"><span><s style="background:var(--mut);opacity:.45"></s>تخصیص</span><span><s style="background:var(--b)"></s>عملکرد</span><span><s style="background:var(--o)"></s>بالاتر از بودجه</span></div></section>
+ <section class="p"><h2>سهم دسته‌ها از کل جذب</h2><svg viewBox="0 0 180 180" width="100%" height="170">${arcs}<text x="90" y="88" text-anchor="middle" style="font-size:20px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="90" y="104" text-anchor="middle">جمع جذب</text></svg><div class="leg">${all.map((c,i)=>`<span><s style="background:${COL[i]}"></s>${c.k} ${f(c.x/tot*100,0)}٪</span>`).join('')}</div></section>
+ <section class="p"><h2>طرف‌حساب‌های برتر</h2>${tp.map((x,i)=>`<div class="row" style="cursor:default;grid-template-columns:120px 1fr 52px"><span class="l">${x[0]}</span><div class="t"><i class="act ${i==0?'over':''}" style="width:${x[1]/tm*100}%;height:100%!important;top:0!important"></i></div><span class="v">${f(x[1])}</span></div>`).join('')||'<p class="note">داده‌ای نیست.</p>'}</section>
+ <section class="p"><h2>روند تجمعی روزانه در برابر تخصیص</h2><svg viewBox="0 0 300 150" width="100%" height="190"><line x1="10" x2="290" y1="${ys(A)}" y2="${ys(A)}" stroke="var(--o)" stroke-dasharray="4 3"/><text x="12" y="${ys(A)-4}">تخصیص ${f(A,0)}</text><polyline fill="none" stroke="var(--b)" stroke-width="2.5" points="${pts.map((v,i)=>xs(i)+','+ys(v)).join(' ')}"/><text x="10" y="144">۱</text><text x="150" y="144">۱۵</text><text x="285" y="144">۳۰</text></svg></section>
+ <section class="p ins"><h2>نکات کلیدی</h2><ul><li>بیشترین مصرف: ${big.k} (${f(big.x/tot*100,0)}٪ از کل)</li><li>بیشترین اضافه‌مصرف: ${ov.k} (${f(ov.x-ov.a)} میلیارد)</li>${pa?`<li>کم‌مصرف‌ترین نسبت به تخصیص: ${pa.k} (${f(pa.x/pa.a*100,0)}٪)</li>`:''}</ul></section></div>`;
+ document.querySelectorAll('.row[data-k]').forEach(r=>r.onclick=()=>{sel=sel==r.dataset.k?'':r.dataset.k;draw()})}
+function review(M){$('view').innerHTML=`<div class="kpis">${kp(f(M.rev,0),'قلم نیازمند تایید')}${kp(f(M.revamt),'مبلغ این اقلام (میلیارد ریال)',1)}${kp(f(M.n,0),'کل ردیف‌های پرداخت')}</div><section class="p w3"><h2>اقلامی که دسته‌شان باید تایید شود</h2><div style="overflow-x:auto"><table><tr><th>تاریخ</th><th>طرف مقابل</th><th>شرح</th><th>مبلغ (میلیارد)</th><th>دسته فعلی</th></tr>${M.rvList.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${f(r[3],2)}</td><td>${r[4]}</td></tr>`).join('')||'<tr><td colspan="5">همه اقلام قطعی هستند.</td></tr>'}</table></div></section>`}
+function sample(){const isS=tab=='sl',nm=isS?'فروش':'تولید',P=isS?[820,900,870,950,1000,980]:[61,64,62,66,68,67],X=isS?[790,910,845,970,990,1010]:[58,65,60,67,66,70],u=isS?'میلیارد ریال':'هزار تن',mx=Math.max(...P,...X);
+ $('view').innerHTML=`<section class="p w3"><h2>${nm}: برنامه در برابر عملکرد (${u}) <span class="tag">نمونه</span></h2><svg viewBox="0 0 360 170" width="100%" height="240">${P.map((p,i)=>`<rect x="${20+i*56}" width="20" y="${140-p/mx*120}" height="${p/mx*120}" fill="var(--mut)" opacity=".45" rx="3"/><rect x="${42+i*56}" width="20" y="${140-X[i]/mx*120}" height="${X[i]/mx*120}" fill="${X[i]<p?'var(--o)':'var(--b)'}" rx="3"/><text x="${34+i*56}" y="158" text-anchor="middle">ماه ${i+1}</text>`).join('')}</svg><p class="note">این صفحه عددهای نمونه دارد و داده واقعی نیست. بعد از اتصال فایل ${nm} با همین قالب نمایش داده می‌شود.</p></section>`}
+</script></body></html>
