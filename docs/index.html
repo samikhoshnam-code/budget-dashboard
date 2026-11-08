@@ -10,7 +10,7 @@
 *{box-sizing:border-box}html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Tahoma,Vazirmatn,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 header{flex:none;background:var(--nav);color:#fff;padding:10px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-header h1{margin:0;font-size:22px}header small{opacity:.85;display:block;font-size:12px}
+header h1{margin:0;font-size:22px}.dates{display:flex;gap:22px;font-size:13px}.dates div{display:flex;flex-direction:column;align-items:center;line-height:1.35}.dates span{opacity:.8;font-size:12px}.dates b{font-weight:600;font-size:14px}.hr{display:flex;gap:10px;align-items:center}.prt{font:inherit;font-size:15px;color:var(--nav);background:#fff;border:2px solid #fff;border-radius:16px;padding:6px 20px;cursor:pointer;font-weight:700}.pronly{display:none;font-size:14px;opacity:.9}
 .tabs{display:flex;gap:10px}.tabs button{font:inherit;font-size:15px;color:#fff;background:transparent;border:2px solid #fff;border-radius:16px;padding:6px 20px;cursor:pointer;font-weight:600}
 .tabs button.on{background:#fff;color:var(--nav)}
 main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 24px 14px}
@@ -43,11 +43,16 @@ table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;border-bottom:1
 #login input{width:100%;padding:12px;margin:14px 0;border:2px solid var(--b);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
 #login button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--kpi);color:#fff;font:inherit;font-weight:700;cursor:pointer}
 #err{color:#C0392B;min-height:20px}
-@media(max-height:800px),(max-width:1100px){body{height:auto;overflow:auto}main{display:block}#view{display:block}.g12{display:block}.p{min-height:300px;margin-top:12px}.kpis{margin-bottom:4px}.row{grid-template-columns:120px 1fr 60px}}
+@media screen and (max-height:800px),screen and (max-width:1100px){body{height:auto;overflow:auto}main{display:block}#view{display:block}.g12{display:block}.p{min-height:300px;margin-top:12px}.kpis{margin-bottom:4px}.row{grid-template-columns:120px 1fr 60px}}
+@page{size:A4 landscape;margin:7mm}
+@media print{:root{--bg:#fff;--card:#fff;--ink:#1F2A44;--mut:#6B7694;--line:#D5DCE8;--nav:#0B4F8A;--b:#1B4F8A;--track:#E3E8F1;--q:#8FA3BF}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{height:auto}body{width:1500px;height:1000px;overflow:hidden;zoom:.7;display:flex;flex-direction:column}
+.noprint,#flt,.ghost{display:none!important}.pronly{display:block!important}header{padding:8px 24px}}
 </style></head><body>
 <div id="login"><form id="lf"><h2 style="margin:0">داشبورد مدیریتی</h2><p class="note">برای دیدن داده‌ها رمز را وارد کنید.</p>
 <input type="password" id="pw" autocomplete="current-password" placeholder="رمز عبور" aria-label="رمز عبور"><div id="err" role="alert"></div><button>ورود</button></form></div>
-<header><div><h1>داشبورد بودجه، تولید و فروش</h1><small id="upd"></small></div><div class="tabs" id="tabs"></div></header>
+<header><div><h1>داشبورد بودجه، تولید و فروش</h1><div id="ptitle" class="pronly"></div></div><div class="dates" id="upd"></div><div class="hr noprint"><div class="tabs" id="tabs"></div><button class="prt" id="prt">چاپ</button></div></header>
 <main id="app" hidden>
 <div class="filters" id="flt">
 <div class="f"><label for="mon">ماه</label><select id="mon"></select></div>
@@ -68,7 +73,9 @@ async function open_(pw){try{D=await dec(pw);sessionStorage.setItem('k',pw)}catc
  $('login').hidden=true;$('app').hidden=false;init()}
 $('lf').onsubmit=e=>{e.preventDefault();open_($('pw').value)};
 const sk=sessionStorage.getItem('k');if(sk)open_(sk);
-function init(){$('upd').textContent='آخرین تراکنش: '+D.lastTx+' | به‌روزرسانی: '+D.updated;
+const pd=s=>String(s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]),jd=d=>d.toLocaleDateString('fa-IR-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit'});
+function stamp(){const u=new Date(String(D.updated).replace(' ','T'));$('upd').innerHTML=`<div><span>امروز</span><b>${jd(new Date())}</b></div><div><span>آخرین تغییرات</span><b>${isNaN(u)?'—':jd(u)+' '+u.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'})}</b></div><div><span>آخرین تراکنش</span><b>${pd(D.lastTx)}</b></div>`}
+function init(){stamp();$('prt').onclick=()=>window.print();
  mk=[...D.order].reverse().find(m=>D.months[m].n>0)||D.order[D.order.length-1];$('mon').innerHTML=D.order.map(m=>`<option value="${m}">${D.months[m].label}</option>`).join('');$('mon').value=mk;
  $('mon').onchange=()=>{mk=$('mon').value;sel='';draw()};
  $('tabs').innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}</button>`).join('');
@@ -94,6 +101,7 @@ function donut(items,tot,selK){let off=0;const R=70,C=2*Math.PI*R;
  const a=items.map((c,i)=>{const l=c.v/tot*C,s=`<circle r="${R}" cx="110" cy="110" fill="none" stroke="${COL[i%10]}" stroke-width="${selK==c.k?36:28}" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)" opacity="${selK&&selK!=c.k?.3:1}"/>`;off+=l;return s}).join('');
  return `<div class="dn"><svg viewBox="0 0 220 220">${a}<text x="110" y="110" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="110" y="132" text-anchor="middle" style="font-size:13px">جمع</text></svg><div class="dl">${items.map((c,i)=>`<div><s style="background:${COL[i%10]}"></s>${c.k}<b>${f(c.v/tot*100,0)}٪</b></div>`).join('')}</div></div>`}
 function draw(){const M=D.months[mk],all=M.cats;
+ $('ptitle').textContent=({ov:'شرح بودجه – '+M.label,rv:'اقلام نیازمند تایید – '+M.label,sl:'فروش',pr:'تولید'})[tab];
  document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.t==tab?'on':'');
  $('flt').hidden=(tab=='sl'||tab=='pr');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
  $('cat').innerHTML='<option value="">همه دسته‌ها</option>'+all.map(c=>`<option>${c.k}</option>`).join('');$('cat').value=sel;
@@ -110,7 +118,7 @@ function draw(){const M=D.months[mk],all=M.cats;
  for(let d=1;d<=ld;d++){const m=M.daily[d]||{};cum+=sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0);pts.push(cum)}
  const tq=Math.max(cum,A,1)*1.08,xs=i=>14+i*(420/29),ys=v=>212-v/tq*190;
  const big=[...all].sort((a,b)=>b.x-a.x)[0],ov=[...all].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0],pa=all.filter(c=>c.a>0).sort((a,b)=>a.x/a.a-b.x/b.a)[0];
- $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp((V>0?'+':'')+f(V),'انحراف از تخصیص',V>0)}${kp(A?f(X/A*100)+'٪':'—','درصد مصرف')}${kp(f(R),'مانده بودجه',R<0)}${kp(M.bal!=null?f(M.bal):'—','مانده حساب بانکی'+(M.lastDate?' تا '+M.lastDate:''))}</div>
+ $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp(f(R),'مانده بودجه',R<0)}</div>
  <div class="g12">${P('بودجه در برابر عملکرد (میلیارد ریال)',`<div class="hb">${bars}</div>`,'c4',leg([['تخصیص','var(--q)'],['عملکرد','var(--b)'],['بالاتر از بودجه','var(--o)']]))}
  ${P('مقایسه بودجه درخواستی و جذب‌شده (میلیارد ریال)',vert,'c5',leg([['درخواستی','var(--q)'],['جذب شده','var(--b)'],['جذب‌شده بالاتر از درخواستی','var(--o)']]))}
  ${P('مانده بودجه هر دسته (میلیارد ریال)',balp,'c3')}
