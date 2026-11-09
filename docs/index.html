@@ -36,7 +36,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 24px 14
 .br{display:flex;justify-content:space-between;padding:3px 2px;border-bottom:1px solid var(--line);font-size:14px}.br b{font-variant-numeric:tabular-nums}.br.dim{opacity:.35}.neg{color:var(--o)}.br.tot{border-bottom:0;font-weight:700;color:var(--b);margin-top:2px}
 .dn{display:flex;align-items:center;gap:10px;height:100%}.dn svg{flex:0 0 46%;width:46%;height:auto;max-height:100%}.dl{flex:1;font-size:13px;line-height:1.75}.dl div{white-space:nowrap}.dl s{display:inline-block;width:11px;height:11px;border-radius:3px;margin-left:6px;text-decoration:none}.dl b{float:left}
 .ins{display:flex;flex-direction:column;justify-content:space-evenly;height:100%}.ins div{background:var(--bg);border-radius:8px;padding:8px 12px;color:var(--b);font-weight:600;font-size:14px}
-.note{color:var(--mut);font-size:13px;margin:8px 0;text-align:center}
+.adv{margin:0;padding:0 16px 0 0;font-size:13.5px;line-height:1.65}.adv li{margin-bottom:7px}.note{color:var(--mut);font-size:13px;margin:8px 0;text-align:center}
 table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}th{color:var(--b)}
 #login{position:fixed;inset:0;background:var(--nav);display:flex;align-items:center;justify-content:center;z-index:9}
 #login form{background:var(--card);padding:34px;border-radius:16px;width:min(400px,90vw);text-align:center}
@@ -63,7 +63,7 @@ html,body{height:auto}body{width:1500px;height:1000px;overflow:hidden;zoom:.7;di
 <script>
 const $=s=>document.getElementById(s),f=(n,d=1)=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d});
 const COL=['#1B4F8A','#FF7F0E','#3B3F9E','#0F8BFF','#6A0F7A','#E5703A','#2E9E8F','#8FA3BF','#C0392B','#F2B134'];
-const TABS=[['ov','شرح بودجه'],['pr','تولید'],['sl','فروش']];
+const TABS=[['ov','شرح بودجه'],['pr','تولید'],['sl','فروش'],['ad','مشاور مدیریتی']];
 let D,sel='',over=false,tab='ov',mk='';
 async function dec(pw){const e=await (await fetch('data.enc?'+Date.now())).json(),b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
@@ -101,11 +101,11 @@ function donut(items,tot,selK){let off=0;const R=70,C=2*Math.PI*R;
  const a=items.map((c,i)=>{const l=c.v/tot*C,s=`<circle r="${R}" cx="110" cy="110" fill="none" stroke="${COL[i%10]}" stroke-width="${selK==c.k?36:28}" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)" opacity="${selK&&selK!=c.k?.3:1}"/>`;off+=l;return s}).join('');
  return `<div class="dn"><svg viewBox="0 0 220 220">${a}<text x="110" y="110" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="110" y="132" text-anchor="middle" style="font-size:13px">جمع</text></svg><div class="dl">${items.map((c,i)=>`<div><s style="background:${COL[i%10]}"></s>${c.k}<b>${f(c.v/tot*100,0)}٪</b></div>`).join('')}</div></div>`}
 function draw(){const M=D.months[mk],all=M.cats;
- $('ptitle').textContent=({ov:'شرح بودجه – '+M.label,rv:'اقلام نیازمند تایید – '+M.label,sl:'فروش',pr:'تولید'})[tab];
+ $('ptitle').textContent=({ov:'شرح بودجه – '+M.label,rv:'اقلام نیازمند تایید – '+M.label,sl:'فروش',pr:'تولید',ad:'مشاور مدیریتی'})[tab];
  document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.t==tab?'on':'');
- $('flt').hidden=(tab=='sl'||tab=='pr');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
+ $('flt').hidden=(tab=='sl'||tab=='pr'||tab=='ad');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
  $('cat').innerHTML='<option value="">همه دسته‌ها</option>'+all.map(c=>`<option>${c.k}</option>`).join('');$('cat').value=sel;
- if(tab=='rv')return review(M);if(tab=='sl')return sales();if(tab=='pr')return prodTab();
+ if(tab=='rv')return review(M);if(tab=='sl')return sales();if(tab=='pr')return prodTab();if(tab=='ad')return advisor();
  const vis=all.filter(c=>!over||c.x>c.a),use=sel?all.filter(c=>c.k==sel):vis;
  const A=use.reduce((s,c)=>s+c.a,0),Q=use.reduce((s,c)=>s+(c.q||0),0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,R=use.reduce((s,c)=>s+(c.p||0)+c.a-c.x,0),tot=all.reduce((s,c)=>s+c.x,0)||1;
  const mx=Math.max(...vis.map(c=>Math.max(c.a,c.x)),1);
@@ -128,24 +128,83 @@ function draw(){const M=D.months[mk],all=M.cats;
  ${P('نکات کلیدی',`<div class="ins"><div>بیشترین مصرف: ${big.k} (${f(big.x/tot*100,0)}٪ از کل)</div><div>بیشترین اضافه‌مصرف: ${ov.k} (${f(ov.x-ov.a)} میلیارد)</div>${pa?`<div>کم‌مصرف‌ترین نسبت به تخصیص: ${pa.k} (${f(pa.x/pa.a*100,0)}٪)</div>`:''}<div>جذب‌شده نسبت به درخواستی: ${Q?f(X/Q*100)+'٪':'—'}</div></div>`,'c3')}</div>`;
  document.querySelectorAll('.row[data-k]').forEach(r=>r.onclick=()=>{sel=sel==r.dataset.k?'':r.dataset.k;draw()})}
 function review(M){$('view').innerHTML=`<div class="kpis">${kp(f(M.rev,0),'قلم نیازمند تایید')}${kp(f(M.revamt),'مبلغ این اقلام (میلیارد ریال)',1)}${kp(f(M.n,0),'کل ردیف‌های پرداخت')}</div><section class="p" style="flex:1"><h2>اقلامی که دسته‌شان باید تایید شود <button class="ghost" id="bk" style="margin:0 12px">بازگشت به شرح بودجه</button></h2><div class="pb"><table><tr><th>تاریخ</th><th>طرف مقابل</th><th>شرح</th><th>مبلغ (میلیارد)</th><th>دسته فعلی</th></tr>${M.rvList.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${f(r[3],2)}</td><td>${r[4]}</td></tr>`).join('')||'<tr><td colspan="5">همه اقلام قطعی هستند.</td></tr>'}</table></div></section>`;$('bk').onclick=()=>{tab='ov';draw()}}
-function noProd(){$('view').innerHTML='<section class="p" style="flex:1"><h2>داده تولید و فروش پیدا نشد</h2><p class="note">فایل «میزان تولیدات ماهیانه» را در پوشه input بگذارید و update.bat را اجرا کنید.</p></section>'}
-const PS=['ورق 8-150','ضایعات سرورق','ضایعات پوسته','اسلب (تختال)','ورق 8-15 (کارمزدی)','پوسته (کارمزدی)'];
-const sm=o=>Object.values(o).reduce((a,b)=>a+b,0);
-function sales(){const Pd=D.prod;if(!Pd)return noProd();const ms=Pd.months.filter(m=>m.has);if(!ms.length)return noProd();
- const tq={},tv={};PS.forEach(p=>{tq[p]=ms.reduce((s,m)=>s+m.sales[p][0],0);tv[p]=ms.reduce((s,m)=>s+m.sales[p][1],0)});
- const Q=sm(tq),Vt=sm(tv),items=PS.map(p=>({k:p,v:tv[p]})).filter(x=>x.v>0),top=[...items].sort((a,b)=>b.v-a.v)[0];
- const series=PS.map((p,i)=>({n:p,c:COL[i],v:ms.map(m=>m.sales[p][1])})).filter(s=>s.v.some(x=>x>0));
- $('view').innerHTML=`<div class="kpis">${kp(f(Q,0),'کل فروش (تن)')}${kp(f(Vt,0),'مبلغ فروش (میلیارد ریال)')}${kp(f(Vt/Q*1000,0),'میانگین قیمت (میلیون ریال/تن)')}${kp(top.k,'محصول اصلی فروش (از نظر مبلغ)')}</div>
- <div class="g12">${P('مبلغ فروش ماهانه به تفکیک محصول (میلیارد ریال)',vchart(ms.map(m=>m.name),series,{stacked:true,W:1000,H:300,pb:36}),'c8',leg(series.map(s=>[s.n,s.c])))}
- ${P('سهم محصولات از مبلغ فروش',donut(items,Vt),'c4')}
- ${P('جدول فروش به تفکیک محصول (تا '+ms[ms.length-1].name+' ۱۴۰۵)',`<table><tr><th>محصول</th><th>تن</th><th>میلیارد ریال</th><th>قیمت (م.ر/تن)</th><th>سهم</th></tr>${PS.filter(p=>tq[p]>0).map(p=>`<tr><td>${p}</td><td>${f(tq[p],0)}</td><td>${f(tv[p],0)}</td><td>${f(tv[p]/tq[p]*1000,0)}</td><td>${f(tv[p]/Vt*100,0)}٪</td></tr>`).join('')}<tr><th>جمع</th><th>${f(Q,0)}</th><th>${f(Vt,0)}</th><th>${f(Vt/Q*1000,0)}</th><th></th></tr></table>`,'c12')}</div>`}
-function prodTab(){const Pd=D.prod;if(!Pd)return noProd();const ms=Pd.months.filter(m=>m.has);if(!ms.length)return noProd();
- const pc=ms.map(m=>sm(m.pc)),pf=ms.map(m=>sm(m.pf)),sq=ms.map(m=>PS.reduce((s,p)=>s+m.sales[p][0],0));
- const TC=pc.reduce((a,b)=>a+b,0),TF=pf.reduce((a,b)=>a+b,0),TS=sq.reduce((a,b)=>a+b,0);
- const mix={};ms.forEach(m=>{Object.entries(m.pc).forEach(([k,v])=>mix[k]=(mix[k]||0)+v)});const items=Object.entries(mix).filter(x=>x[1]>0).map(([k,v])=>({k,v}));
- const raw=ms.filter(m=>m.raw[0]||m.raw[1]);
- $('view').innerHTML=`<div class="kpis">${kp(f(TC,0),'تولید شرکتی (تن)')}${kp(f(TF,0),'تولید کارمزدی (تن)')}${kp(f(TS,0),'فروش کل (تن)')}${kp(TC+TF?f(TS/(TC+TF)*100,0)+'٪':'—','فروش نسبت به تولید')}</div>
- <div class="g12">${P('تولید و فروش ماهانه (تن)',vchart(ms.map(m=>m.name),[{n:'تولید',c:'var(--b)',v:pc.map((x,i)=>x+pf[i])},{n:'فروش',c:'var(--o)',v:sq}],{W:1000,H:300,pb:36}),'c8',leg([['تولید (شرکتی و کارمزدی)','var(--b)'],['فروش','var(--o)']]))}
- ${P('ترکیب تولید شرکتی (تن)',donut(items,TC),'c4')}
- ${P('مواد اولیه (اسلب): رسید انبار و فاکتور – تا '+ms[ms.length-1].name+' ۱۴۰۵',`<table><tr><th>ماه</th><th>رسید انبار (تن)</th><th>فاکتور (تن)</th><th>فی (م.ر/تن)</th></tr>${raw.map(m=>`<tr><td>${m.name}</td><td>${f(m.raw[0],0)}</td><td>${f(m.raw[1],0)}</td><td>${m.raw[3]?f(m.raw[3],0):'—'}</td></tr>`).join('')||'<tr><td colspan="4">داده‌ای نیست.</td></tr>'}</table>`,'c12')}</div>`}
+function noProd(m){$('view').innerHTML='<section class="p" style="flex:1"><h2>داده کافی نیست</h2><p class="note">'+(m||'فایل فروش، گزارش تولید (PDF) و فایل تولید را در پوشه input بگذارید و update.bat را اجرا کنید.')+'</p></section>'}
+const PP=m=>m.plan*Math.min(1,Number(m.end.slice(8,10))/(Number(m.k.slice(5,7))<=6?31:30)),T=t=>pd(String(t)),pl=c=>/^\d+$/.test(c),sum=a=>a.reduce((x,y)=>x+y,0),sg=n=>(n>0?'+':'')+f(n,0);
+function MET(){const S=D.sales2,R=D.rep,PRD=D.prod;if(!S||!R)return null;
+ const sm=S.order.map(k=>({k,n:S.months[k].name,c:S.months[k].cats})),rm=R.order.map(k=>Object.assign({k},R.months[k]));
+ const ths=[...new Set(sm.flatMap(m=>Object.keys(m.c).filter(pl)))].sort((a,b)=>a-b),sale={},prod={};
+ ths.forEach(t=>{let q=0,v=0;sm.forEach(m=>{const x=m.c[t];if(x){q+=x[0];v+=x[1]}});sale[t]={q,v,p:q?v/q*1000:0}});
+ const pk=[...new Set(rm.flatMap(m=>Object.keys(m.th)))].sort((a,b)=>a-b);
+ pk.forEach(t=>{let x=0,p=0,ex=0,ep=0;rm.forEach(m=>{const a=m.th[t],fc=PP(m)/(m.plan||1);if(a){x+=a[0];p+=a[1]*fc;ex+=a[2];ep+=a[3]*fc}});prod[t]={x,p,ex,ep,k:x>0?ex/x:null}});
+ const pm=((PRD&&PRD.months)||[]).filter(m=>m.has&&m.raw[1]>0),slabT=sum(pm.map(m=>m.raw[1])),slab=slabT?sum(pm.map(m=>m.raw[2]))/slabT*1000:0;
+ let hrs=0,eq=0;rm.forEach(m=>{hrs+=(m.avgHrs||0)*Number(m.end.slice(8,10));eq+=m.eqProd});const rate=hrs?eq/hrs:0;
+ const rows=ths.filter(t=>sale[t].q>=100&&prod[t]&&prod[t].k).map(t=>{const sp=sale[t].p-slab,k=prod[t].k;return{t,q:sale[t].q,p:sale[t].p,sp,k,me:sp/k,mh:sp*rate/k/1000}}).sort((a,b)=>b.mh-a.mh);
+ return{sm,rm,ths,sale,prod,pk,pm,slab,rate,rows}}
+function lchart(labels,series,o={}){const W=o.W||640,H=o.H||250,pl_=34,pr=14,pt=14,pb=30,n=labels.length,st=(W-pl_-pr)/Math.max(n-1,1);
+ const all=series.flatMap(x=>x.v.filter(y=>y!=null)),mn=o.min!=null?o.min:Math.min(...all)*.92,mx=o.max!=null?o.max:Math.max(...all)*1.05,y=v=>pt+(H-pt-pb)*(1-(v-mn)/((mx-mn)||1));
+ let s=`<svg viewBox="0 0 ${W} ${H}">`;for(let k=0;k<=3;k++){const yy=pt+(H-pt-pb)*k/3;s+=`<line class="ax" x1="${pl_}" x2="${W-pr}" y1="${yy}" y2="${yy}"/><text x="${pl_-4}" y="${yy+4}" text-anchor="end">${f(mx-(mx-mn)*k/3,0)}</text>`}
+ labels.forEach((l,i)=>{s+=`<text x="${W-pr-i*st}" y="${H-8}" text-anchor="middle" style="fill:var(--ink)">${l}</text>`});
+ series.forEach(sr=>{const pts=sr.v.map((v,i)=>v==null?null:[W-pr-i*st,y(v)]).filter(Boolean);s+=`<polyline fill="none" style="stroke:${sr.c}" stroke-width="2.6" points="${pts.map(p=>p.join(',')).join(' ')}"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.2" style="fill:${sr.c}"/>`).join('')});return s+'</svg>'}
+function tbl(h,rows,tot){return `<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}${tot?`<tr>${tot.map(x=>`<th>${x}</th>`).join('')}</tr>`:''}</table>`}
+function sales(){const M=MET();if(!M)return noProd();const S=M.sm,rank=[...M.ths].sort((a,b)=>M.sale[b].v-M.sale[a].v),top=rank.slice(0,6);
+ const oth=(m,f_)=>Object.entries(m.c).filter(([k])=>f_(k)).reduce((s,[,x])=>[s[0]+x[0],s[1]+x[1]],[0,0]);
+ const ser=top.map((t,i)=>({n:'ضخامت '+T(t),c:COL[i],v:S.map(m=>(m.c[t]||[0,0])[1])}));
+ ser.push({n:'سایر ضخامت‌ها',c:COL[6],v:S.map(m=>oth(m,k=>pl(k)&&!top.includes(k))[1])});ser.push({n:'سرورق، پوسته و ضایعات',c:COL[7],v:S.map(m=>oth(m,k=>!pl(k))[1])});
+ const tq=sum(S.map(m=>sum(Object.values(m.c).map(x=>x[0])))),tv=sum(S.map(m=>sum(Object.values(m.c).map(x=>x[1])))),items=ser.map(x=>({k:x.n,v:sum(x.v)})).filter(x=>x.v>0);
+ const lt=['8','10','12','15','20','25','30'].filter(t=>M.sale[t]),lines=lt.map((t,i)=>({n:'ضخامت '+T(t),c:COL[i],v:S.map(m=>{const x=m.c[t];return x&&x[0]>50?x[1]/x[0]*1000:null})}));
+ const rowsT=top.map(t=>['ضخامت '+T(t),f(M.sale[t].q,0),f(M.sale[t].v,0),f(M.sale[t].p,0),f(M.sale[t].v/tv*100,0)+'٪']);
+ const rest=rank.slice(6),rq=sum(rest.map(t=>M.sale[t].q)),rv=sum(rest.map(t=>M.sale[t].v)),sq=sum(S.map(m=>oth(m,k=>!pl(k))[0])),sv=sum(S.map(m=>oth(m,k=>!pl(k))[1]));
+ rowsT.push(['سایر ضخامت‌ها',f(rq,0),f(rv,0),f(rq?rv/rq*1000:0,0),f(rv/tv*100,0)+'٪']);rowsT.push(['سرورق، پوسته و ضایعات',f(sq,0),f(sv,0),f(sq?sv/sq*1000:0,0),f(sv/tv*100,0)+'٪']);
+ $('view').innerHTML=`<div class="kpis">${kp(f(tq,0),'کل فروش (تن)')}${kp(f(tv,0),'مبلغ فروش (میلیارد ریال)')}${kp(f(tv/tq*1000,0),'میانگین قیمت (میلیون ریال/تن)')}${kp('ضخامت '+T(top[0]),'پرفروش‌ترین از نظر مبلغ')}</div>
+ <div class="g12">${P('مبلغ فروش ماهانه به تفکیک ضخامت ورق (میلیارد ریال)',vchart(S.map(m=>m.n),ser,{stacked:true,W:1000,H:300,pb:30}),'c8',leg(ser.map(x=>[x.n,x.c])))}
+ ${P('سهم هر ضخامت از مبلغ فروش',donut(items,tv),'c4')}
+ ${P('قیمت فروش هر تن به تفکیک ضخامت (میلیون ریال)',lchart(S.map(m=>m.n),lines,{W:640,H:250}),'c5',leg(lines.map(x=>[x.n,x.c])))}
+ ${P('جدول فروش تجمعی به تفکیک ضخامت',tbl(['ضخامت','تن','میلیارد ریال','قیمت (م.ر/تن)','سهم'],rowsT,['جمع',f(tq,0),f(tv,0),f(tv/tq*1000,0),'۱۰۰٪']),'c7')}</div>`}
+function prodTab(){const M=MET();if(!M)return noProd();const R=M.rm,last=R[R.length-1],lbl=m=>m.label.split(' ')[0];
+ const tp=sum(R.map(m=>m.prod)),tpl=sum(R.map(PP));
+ const cause={};R.forEach(m=>Object.entries(m.stops).forEach(([k,v])=>cause[k]=(cause[k]||0)+v));const rk=Object.entries(cause).sort((a,b)=>b[1]-a[1]).map(x=>x[0]),tc=rk.slice(0,5);
+ const ss=tc.map((k,i)=>({n:k,c:COL[i],v:R.map(m=>(m.stops[k]||0)/60)}));ss.push({n:'سایر علل',c:COL[7],v:R.map(m=>(m.stopTotal-sum(tc.map(k=>m.stops[k]||0)))/60)});
+ const ll=[{n:'بهره‌برداری نورد (٪ از ۲۴ ساعت)',c:'#1B4F8A',v:R.map(m=>m.avgHrs/24*100)},{n:'سهم دوبار گرمایشی (٪)',c:'#FF7F0E',v:R.map(m=>m.double)}];
+ const rows=M.pk.filter(t=>M.prod[t].x>0).map(t=>{const p=M.prod[t];return['ضخامت '+T(t),f(p.x,0),f(p.x/tp*100,0)+'٪',f(p.p,0),p.p?f(p.x/p.p*100,0)+'٪':'—',p.k?f(p.k,2):'—']});
+ $('view').innerHTML=`<div class="kpis">${kp(f(tp,0),'تولید تجمعی (تن)')}${kp(f(tp/tpl*100,0)+'٪','تحقق برنامه تجمعی',tp<tpl*.6)}${kp(f(last.avgHrs,1),'میانگین ساعت نورد روزانه – '+lbl(last))}${kp(f(last.stopTotal/60,0),'ساعت توقف – '+lbl(last))}</div>
+ <div class="g12">${P('تولید در برابر برنامه ماهانه (تن)',vchart(R.map(lbl),[{n:'برنامه (تا تاریخ گزارش)',c:'var(--q)',v:R.map(PP)},{n:'تولید',c:'var(--b)',v:R.map(m=>m.prod),cc:R.map(m=>m.prod>=PP(m)?'#2E9E8F':null)}],{W:760,H:300,pb:30}),'c7',leg([['برنامه (تا تاریخ گزارش)','var(--q)'],['تولید','var(--b)'],['تولید بیش از برنامه','#2E9E8F']]))}
+ ${P('علل توقف نورد (ساعت)',vchart(R.map(lbl),ss,{stacked:true,W:540,H:300,pb:30}),'c5',leg(ss.map(x=>[x.n,x.c])))}
+ ${P('تولید تجمعی به تفکیک ضخامت',tbl(['ضخامت','تولید (تن)','سهم','برنامه (تن)','تحقق','ضریب نورد'],rows),'c7')}
+ ${P('بهره‌برداری نورد و سهم دوبار گرمایشی',lchart(R.map(lbl),ll,{W:540,H:250,min:0,max:100}),'c5',leg(ll.map(x=>[x.n,x.c])))}</div>`}
+function advisor(){const M=MET();if(!M)return noProd();const R=M.rm,S=M.sm,last=R[R.length-1],pL=last.label.split(' ')[0],hp=(Number(last.end.slice(8,10))<28)?' (تا '+pd(last.end.slice(5))+')':'';
+ const tp=sum(R.map(m=>m.prod)),tpl=sum(R.map(PP)),bh=[...R].sort((a,b)=>b.avgHrs-a.avgHrs)[0];
+ const cause={};R.forEach(m=>Object.entries(m.stops).forEach(([k,v])=>{if(k!='سایر'&&k!='سایر گروه‌ها')cause[k]=(cause[k]||0)+v}));const cr=Object.entries(cause).sort((a,b)=>b[1]-a[1]).slice(0,3),ct=sum(Object.values(cause));
+ const grp=(a,b)=>{let x=0,p=0;M.pk.forEach(t=>{if(t>=a&&t<=b){x+=M.prod[t].x;p+=M.prod[t].p}});return[x,p]},g1=grp(8,12),g2=grp(15,40);
+ const pv=R.length>1?R[R.length-2]:null,tq=sum(S.map(m=>sum(Object.values(m.c).map(x=>x[0])))),tv=sum(S.map(m=>sum(Object.values(m.c).map(x=>x[1]))));
+ const rank=[...M.ths].sort((a,b)=>M.sale[b].v-M.sale[a].v),t3=rank.slice(0,3),sh3=sum(t3.map(t=>M.sale[t].v))/tv*100;
+ const mt=m=>sum(Object.values(m.c).map(x=>x[1])),mq=m=>sum(Object.values(m.c).map(x=>x[0])),full=S.filter(m=>R.find(r=>r.k==m.k&&Number(r.end.slice(8,10))>=28)),a1=full[full.length-1],a0=full[full.length-2];
+ const diff=M.ths.map(t=>[t,M.prod[t]?M.prod[t].x-M.sale[t].q:0]).filter(x=>M.prod[x[0]]);const build=diff.filter(x=>x[1]>800).sort((a,b)=>b[1]-a[1]).slice(0,3),drain=diff.filter(x=>x[1]<-800).sort((a,b)=>a[1]-b[1]).slice(0,3);
+ const mainR=M.rows.filter(r=>r.q>=1000),best=mainR[0],worst=mainR[mainR.length-1],thin=M.rows.filter(r=>r.t<=12),mid=M.rows.filter(r=>r.t>=15&&r.t<=40),av=a=>a.length?sum(a.map(r=>r.mh))/a.length:0;
+ const neg=M.rows.filter(r=>r.sp<0).concat(M.ths.filter(t=>M.sale[t].q>0&&M.sale[t].q<100&&M.sale[t].p-M.slab<0).map(t=>({t,sp:M.sale[t].p-M.slab,p:M.sale[t].p})));
+ const niche=M.rows.length?M.rows.filter(r=>r.q<1000&&r.sp>sum(M.rows.map(x=>x.sp))/M.rows.length):[];
+ const pr=m=>{const e=Object.entries(m.c).filter(([k])=>pl(k));const q=sum(e.map(x=>x[1][0]));return q?sum(e.map(x=>x[1][1]))/q*1000:0},fee=n=>{const x=M.pm.find(m=>m.name==n);return x?x.raw[3]:0};
+ const fm=S.filter(m=>fee(m.n)>0),m0=fm[0],m1=fm[fm.length-1];
+ const cur=D.months[[...D.order].reverse().find(m=>D.months[m].n>0)||D.order[D.order.length-1]],ca=sum(cur.cats.map(c=>c.a)),cx=sum(cur.cats.map(c=>c.x)),cov=[...cur.cats].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0];
+ const li=a=>a.filter(Boolean).map(x=>`<li>${x}</li>`).join('');
+ const prodL=[`تولید تجمعی ${f(tp,0)} تن از برنامه تا تاریخ گزارش ${f(tpl,0)} تن (${f(tp/tpl*100,0)}٪) است؛ ${pL}${hp}: ${f(last.prod/PP(last)*100,0)}٪ برنامه تا این تاریخ.`,
+  `میانگین نورد روزانه ${pL} ${f(last.avgHrs,1)} ساعت (${f(last.avgHrs/24*100,0)}٪ ظرفیت) است؛ بهترین ماه ${bh.label.split(' ')[0]} با ${f(bh.avgHrs,1)} ساعت.`,
+  cr.length?`بیشترین علل توقف (جمع ماه‌ها): ${cr.map(c=>c[0]+' '+f(c[1]/60,0)+' ساعت').join('، ')}؛ سهم قطع برق شبکه از توقف‌های ثبت‌شده ${f((cause['قطع شبکه برق']||0)/ct*100,0)}٪.`:'',
+  g1[1]&&g2[1]?`تحقق برنامه ضخامت ۸ تا ۱۲: ${f(g1[0]/g1[1]*100,0)}٪ و ضخامت ۱۵ تا ۴۰: ${f(g2[0]/g2[1]*100,0)}٪؛ ${g1[0]/g1[1]>1.2&&g2[0]/g2[1]<.8?'برنامه ترکیب ضخامت‌ها با واقعیت فاصله دارد و باید بازنگری شود.':'ترکیب برنامه را با تقاضا تطبیق دهید.'}`:'',
+  pv&&last.double!=null?`سهم تولید دوبار گرمایشی ${pL} ${f(last.double,0)}٪ (ماه قبل ${f(pv.double,0)}٪)؛ هر چه کمتر باشد مصرف انرژی کمتر است.`:''];
+ const salL=[`فروش تجمعی ${f(tq,0)} تن و ${f(tv,0)} میلیارد ریال؛ میانگین قیمت ${f(tv/tq*1000,0)} میلیون ریال بر تن.`,
+  `سه ضخامت برتر ${t3.map(T).join('، ')} با ${f(sh3,0)}٪ مبلغ فروش؛ تمرکز بالا ریسک وابستگی به این بازار را بالا می‌برد.`,
+  a1&&a0?`${a1.n} نسبت به ${a0.n}: مبلغ فروش ${sg((mt(a1)/mt(a0)-1)*100)}٪ و تناژ ${sg((mq(a1)/mq(a0)-1)*100)}٪.`:'',
+  build.length||drain.length?`موجودی (تولید منهای فروش، تجمعی): ${build.length?'انباشت در ضخامت '+build.map(x=>T(x[0])+' ('+f(x[1],0)+' تن)').join('، '):''}${build.length&&drain.length?'؛ ':''}${drain.length?'برداشت از موجودی در ضخامت '+drain.map(x=>T(x[0])+' ('+f(-x[1],0)+' تن)').join('، '):''}.`:''];
+ const mkL=[best?`بین ضخامت‌های پرفروش (بالای ۱٬۰۰۰ تن)، بیشترین سود ناخالص به‌ازای هر ساعت نورد مربوط به ضخامت ${T(best.t)} (${f(best.mh,1)} میلیارد ریال) و کمترین مربوط به ضخامت ${T(worst.t)} (${f(worst.mh,1)}) است.`:'',
+  thin.length&&mid.length?`ضخامت‌های نازک (۸ تا ۱۲) قیمت بالاتری دارند ولی زمان نورد بیشتری می‌گیرند؛ سود به‌ازای ساعت آن‌ها ${f(av(thin),1)} در برابر ${f(av(mid),1)} میلیارد برای ضخامت ۱۵ تا ۴۰ است.`:'',
+  niche.length?`ضخامت ${niche.map(r=>T(r.t)).join('، ')} حجم کم ولی حاشیه بالا دارد؛ فرصت بازاریابی هدفمند.`:'',
+  neg.length?`ضخامت ${neg.map(r=>T(r.t)).join('، ')} با میانگین قیمت کمتر از هزینه اسلب فروخته شده؛ قیمت‌گذاری یا ادامه فروش را بازنگری کنید.`:''];
+ const finL=[m0&&m1&&m0!=m1?`قیمت اسلب فاکتورشده از ${f(fee(m0.n),0)} (${m0.n}) به ${f(fee(m1.n),0)} (${m1.n}) میلیون ریال بر تن رسید (${sg((fee(m1.n)/fee(m0.n)-1)*100)}٪)، در حالی که میانگین قیمت فروش ورق ${sg((pr(m1)/pr(m0)-1)*100)}٪ تغییر کرد.`:'',
+  m1?`حاشیه ناخالص تقریبی (فروش منهای اسلب) ${m1.n}: ${f(pr(m1)-fee(m1.n),0)} میلیون ریال بر تن (${f((pr(m1)-fee(m1.n))/pr(m1)*100,0)}٪ قیمت فروش).`:'',
+  `بودجه ${cur.label}: ${f(cx,0)} از ${f(ca,0)} میلیارد (${f(cx/ca*100,0)}٪)؛ بیشترین اضافه‌مصرف ${cov.k} (${sg(cov.x-cov.a)} میلیارد).`,
+  'این تحلیل بر پایه قیمت اسلب فاکتورشده است و هزینه انرژی، دستمزد، غلتک و فروش ضایعات را شامل نمی‌شود.'];
+ const hr=M.rows;
+ $('view').innerHTML=`<div class="g12">${P('سودآوری ضخامت‌ها (تجمعی – مرتب بر اساس سود به‌ازای ساعت نورد)',tbl(['ضخامت','فروش (تن)','قیمت (م.ر/تن)','حاشیه (م.ر/تن)','ضریب نورد','سود/ساعت نورد (میلیارد)'],hr.map((r,i)=>['ضخامت '+T(r.t),f(r.q,0),f(r.p,0),`<span class="${r.sp<0?'neg':''}">${f(r.sp,0)}</span>`,f(r.k,2),`<b ${i==0?'style="color:var(--o)"':''}>${f(r.mh,1)}</b>`])),'c8')}
+ ${P('سود ناخالص به‌ازای هر ساعت نورد (میلیارد ریال)',vchart(hr.map(r=>T(r.t)).reverse(),[{n:'سود/ساعت',c:'var(--b)',v:hr.map(r=>r.mh).reverse(),cc:hr.map(r=>r===best?'#FF7F0E':null).reverse()}],{W:460,H:290,pb:30}),'c4')}
+ ${P('مشاور تولید',`<ul class="adv">${li(prodL)}</ul>`,'c3')}${P('مشاور فروش',`<ul class="adv">${li(salL)}</ul>`,'c3')}${P('مشاور بازاریابی',`<ul class="adv">${li(mkL)}</ul>`,'c3')}${P('مدیر مالی',`<ul class="adv">${li(finL)}</ul>`,'c3')}</div>`}
 </script></body></html>
