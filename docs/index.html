@@ -23,7 +23,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 24px 14
 .kpis{flex:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .kpi{background:var(--kpi);color:#fff;border-radius:34px;padding:10px 8px;text-align:center}.kpi b{display:block;font-size:32px;line-height:1.25}.kpi span{font-size:14px;opacity:.92}.kpi.hot b{color:#FFB066}
 .g12{flex:1;min-height:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:12px}
-.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c8{grid-column:span 8}.c12{grid-column:1/-1}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:1/-1}
 .p{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .p h2{flex:none;margin:0 0 6px;font-size:16px;text-align:center}.pb{flex:1;min-height:0;overflow:auto}
 .hb{display:flex;flex-direction:column;justify-content:space-evenly;height:100%}
@@ -110,7 +110,7 @@ function draw(){const M=D.months[mk],all=M.cats;
  const A=use.reduce((s,c)=>s+c.a,0),Q=use.reduce((s,c)=>s+(c.q||0),0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,R=use.reduce((s,c)=>s+(c.p||0)+c.a-c.x,0),tot=all.reduce((s,c)=>s+c.x,0)||1;
  const mx=Math.max(...vis.map(c=>Math.max(c.a,c.x)),1);
  const pi=D.order.indexOf(mk),PM=pi>0?D.months[D.order[pi-1]]:null,dys=m=>{const d=Object.keys(m.daily).map(Number);return d.length?Math.max(...d):0},e1=dys(M);
- const cumTo=(m,k,e)=>{let t=0;for(let d=1;d<=e;d++){const x=m.daily[d];if(x&&x[k])t+=x[k]}return t},rr=vis.map(c=>({k:c.k,a:cumTo(M,c.k,e1),b:PM?cumTo(PM,c.k,e1):0})),rmx=Math.max(...rr.map(r=>Math.max(r.a,r.b)),.01);
+ const cumTo=(m,k,e)=>{let t=0;for(let d=1;d<=e;d++){const x=m.daily[d];if(x&&x[k])t+=x[k]}return t},rr=vis.map(c=>{const p=PM?PM.cats.find(x=>x.k==c.k):null;return{k:c.k,a:c.x,b:p?p.x:0}}),rmx=Math.max(...rr.map(r=>Math.max(r.a,r.b)),.01);
  const bars=PM?rr.map(r=>`<div class="row ${sel&&sel!=r.k?'dim':''}" data-k="${r.k}"><span class="l">${r.k}</span><div class="t"><i class="bud" style="width:${r.b/rmx*100}%"></i><i class="act ${r.b>0&&r.a>r.b*1.1?'over':''}" style="width:${r.a/rmx*100}%"></i></div><span class="v">${r.b>0?sg((r.a/r.b-1)*100)+'٪':'—'}</span></div>`).join(''):'<p class="note">ماه قبل برای مقایسه موجود نیست.</p>';
  const vert=vchart(all.map(c=>c.k),[{n:'درخواستی',c:'var(--q)',v:all.map(c=>c.q||0)},{n:'جذب شده',c:'var(--b)',v:all.map(c=>c.x),cc:all.map(c=>c.x>(c.q||0)?'#FF7F0E':null)}],{W:760,H:300,pb:58,wn:9});
  const rem=all.map(c=>[c.k,(c.p||0)+c.a-c.x]),RT=rem.reduce((s,x)=>s+x[1],0);
@@ -121,7 +121,7 @@ function draw(){const M=D.months[mk],all=M.cats;
  const tq=Math.max(cum,A,1)*1.08,xs=i=>14+i*(420/29),ys=v=>212-v/tq*190;
  const big=[...all].sort((a,b)=>b.x-a.x)[0],ov=[...all].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0],pa=all.filter(c=>c.a>0).sort((a,b)=>a.x/a.a-b.x/b.a)[0];
  $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp(f(R),'مانده بودجه',R<0)}</div>
- <div class="g12">${P('مقایسه با ماه قبل تا همین روز (تا روز '+pd(e1)+' ماه)',`<div class="hb">${bars}</div>`,'c4',leg([[PM?PM.label:'ماه قبل','var(--q)'],[M.label,'var(--b)'],['بیش از ۱۰٪ افزایش','var(--o)']]))}
+ <div class="g12">${P('مقایسه ماهانه با ماه قبل (میلیارد ریال)',`<div class="hb">${bars}</div>`,'c4',leg([[PM?PM.label:'ماه قبل','var(--q)'],[M.label+(e1&&e1<(Number(mk.slice(5,7))<=6?31:30)?' (تا روز '+pd(e1)+')':''),'var(--b)'],['بیش از ۱۰٪ افزایش','var(--o)']]))}
  ${P('مقایسه بودجه درخواستی و جذب‌شده (میلیارد ریال)',vert,'c5',leg([['درخواستی','var(--q)'],['جذب شده','var(--b)'],['جذب‌شده بالاتر از درخواستی','var(--o)']]))}
  ${P('مانده بودجه هر دسته (میلیارد ریال)',balp,'c3')}
  ${P('سهم دسته‌ها از کل جذب',donut(all.map(c=>({k:c.k,v:c.x})),tot,sel),'c3')}
