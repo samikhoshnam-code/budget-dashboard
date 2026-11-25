@@ -36,7 +36,7 @@ main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 24px 14
 .br{display:flex;justify-content:space-between;padding:3px 2px;border-bottom:1px solid var(--line);font-size:14px}.br b{font-variant-numeric:tabular-nums}.br.dim{opacity:.35}.neg{color:var(--o)}.br.tot{border-bottom:0;font-weight:700;color:var(--b);margin-top:2px}
 .dn{display:flex;align-items:center;gap:10px;height:100%}.dn svg{flex:0 0 46%;width:46%;height:auto;max-height:100%}.dl{flex:1;font-size:13px;line-height:1.75}.dl div{white-space:nowrap}.dl s{display:inline-block;width:11px;height:11px;border-radius:3px;margin-left:6px;text-decoration:none}.dl b{float:left}
 .ins{display:flex;flex-direction:column;justify-content:space-evenly;height:100%}.ins div{background:var(--bg);border-radius:8px;padding:8px 12px;color:var(--b);font-weight:600;font-size:14px}
-.adv{margin:0;padding:0 16px 0 0;font-size:13.5px;line-height:1.65}.adv li{margin-bottom:7px}.big table th,.big table td{font-size:15px;padding:4px 10px}.note{color:var(--mut);font-size:13px;margin:8px 0;text-align:center}
+.adv{margin:0;padding:0 16px 0 0;font-size:13.5px;line-height:1.65}.adv li{margin-bottom:7px}.big table th,.big table td{font-size:15px;padding:4px 10px}.tall{grid-row:span 2}.pay textarea,.pay input[type=password]{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--ink)}.pay textarea{height:70px;direction:ltr;font-family:monospace;font-size:12px}.ok{color:#2E9E8F;font-weight:700}.cut{color:var(--o);font-weight:600}.off{opacity:.5}.note{color:var(--mut);font-size:13px;margin:8px 0;text-align:center}
 table{width:100%;border-collapse:collapse}th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}th{color:var(--b)}
 #login{position:fixed;inset:0;background:var(--nav);display:flex;align-items:center;justify-content:center;z-index:9}
 #login form{background:var(--card);padding:34px;border-radius:16px;width:min(400px,90vw);text-align:center}
@@ -63,7 +63,7 @@ html,body{height:auto}body{width:1500px;height:1000px;overflow:hidden;zoom:.7;di
 <script>
 const $=s=>document.getElementById(s),f=(n,d=1)=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:d});
 const COL=['#1B4F8A','#FF7F0E','#3B3F9E','#0F8BFF','#6A0F7A','#E5703A','#2E9E8F','#8FA3BF','#C0392B','#F2B134'];
-const TABS=[['ov','بودجه'],['pr','تولید'],['sl','فروش'],['ad','مشاور مدیریتی']];
+const TABS=[['ov','بودجه'],['pr','تولید'],['sl','فروش'],['ad','مشاور مدیریتی'],['pay','لیست پرداخت']];
 let D,sel='',over=false,tab='ov',mk='';
 async function dec(pw){const e=await (await fetch('data.enc?'+Date.now())).json(),b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
@@ -101,11 +101,11 @@ function donut(items,tot,selK){let off=0;const R=70,C=2*Math.PI*R;
  const a=items.map((c,i)=>{const l=c.v/tot*C,s=`<circle r="${R}" cx="110" cy="110" fill="none" stroke="${COL[i%10]}" stroke-width="${selK==c.k?36:28}" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 110 110)" opacity="${selK&&selK!=c.k?.3:1}"/>`;off+=l;return s}).join('');
  return `<div class="dn"><svg viewBox="0 0 220 220">${a}<text x="110" y="110" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">${f(tot,0)}</text><text x="110" y="132" text-anchor="middle" style="font-size:13px">جمع</text></svg><div class="dl">${items.map((c,i)=>`<div><s style="background:${COL[i%10]}"></s>${c.k}<b>${f(c.v/tot*100,0)}٪</b></div>`).join('')}</div></div>`}
 function draw(){const M=D.months[mk],all=M.cats;
- $('ptitle').textContent=({ov:'بودجه – '+M.label,rv:'اقلام نیازمند تایید – '+M.label,sl:'فروش',pr:'تولید',ad:'مشاور مدیریتی'})[tab];
+ $('ptitle').textContent=({ov:'بودجه – '+M.label,rv:'اقلام نیازمند تایید – '+M.label,sl:'فروش',pr:'تولید',ad:'مشاور مدیریتی',pay:'لیست پرداخت'})[tab];
  document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.t==tab?'on':'');
- $('flt').hidden=(tab=='sl'||tab=='pr'||tab=='ad');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
+ $('flt').hidden=(tab=='sl'||tab=='pr'||tab=='ad'||tab=='pay');$('rvbtn').textContent='اقلام نیازمند تایید ('+f(M.rev,0)+')';
  $('cat').innerHTML='<option value="">همه دسته‌ها</option>'+all.map(c=>`<option>${c.k}</option>`).join('');$('cat').value=sel;
- if(tab=='rv')return review(M);if(tab=='sl')return sales();if(tab=='pr')return prodTab();if(tab=='ad')return advisor();
+ if(tab=='rv')return review(M);if(tab=='sl')return sales();if(tab=='pr')return prodTab();if(tab=='ad')return advisor();if(tab=='pay')return payTab();
  const vis=all.filter(c=>!over||c.x>c.a),use=sel?all.filter(c=>c.k==sel):vis;
  const A=use.reduce((s,c)=>s+c.a,0),Q=use.reduce((s,c)=>s+(c.q||0),0),X=use.reduce((s,c)=>s+c.x,0),V=X-A,R=use.reduce((s,c)=>s+(c.p||0)+c.a-c.x,0),tot=all.reduce((s,c)=>s+c.x,0)||1;
  const mx=Math.max(...vis.map(c=>Math.max(c.a,c.x)),1);
@@ -210,4 +210,22 @@ function advisor(){const M=MET();if(!M)return noProd();const R=M.rm,S=M.sm,last=
  $('view').innerHTML=`<div class="g12">${P('سودآوری ضخامت‌ها (تجمعی – مرتب بر اساس سود به‌ازای ساعت نورد)',tbl(['ضخامت','فروش (تن)','قیمت (م.ر/تن)','حاشیه (م.ر/تن)','ضریب نورد','سود/ساعت نورد (میلیارد)'],hr.map((r,i)=>['ضخامت '+T(r.t),f(r.q,0),f(r.p,0),`<span class="${r.sp<0?'neg':''}">${f(r.sp,0)}</span>`,f(r.k,2),`<b ${i==0?'style="color:var(--o)"':''}>${f(r.mh,1)}</b>`])),'c8')}
  ${P('سود ناخالص به‌ازای هر ساعت نورد (میلیارد ریال)',vchart(hr.map(r=>T(r.t)).reverse(),[{n:'سود/ساعت',c:'var(--b)',v:hr.map(r=>r.mh).reverse(),cc:hr.map(r=>r===best?'#FF7F0E':null).reverse()}],{W:520,H:240,pb:30}),'c4')}
  ${P('مشاور تولید',`<ul class="adv">${li(prodL)}</ul>`,'c3')}${P('مشاور فروش',`<ul class="adv">${li(salL)}</ul>`,'c3')}${P('مشاور بازاریابی',`<ul class="adv">${li(mkL)}</ul>`,'c3')}${P('مدیر مالی',`<ul class="adv">${li(finL)}</ul>`,'c3')}</div>`}
+
+let DEC=null;const b64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+async function decodeSel(code,pw){const p=code.trim().split('.');if(p[0]!='PAY1'||p.length!=4)throw new Error('format');
+ const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+ const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(p[1]),iterations:200000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(p[2])},k,b64(p[3]))))}
+function payTab(){const PY=D.pay;if(!PY||!PY.items.length)return noProd('شیت «لیست پرداخت» در فایل اکسل پیدا نشد یا همه ردیف‌ها پرداخت‌شده‌اند.');
+ const items=PY.items,tot=sum(items.map(i=>i.a))/1e9,lm=[...D.order].reverse().find(m=>D.months[m].bal!=null),bal=lm?D.months[lm].bal:null;
+ const dm={};if(DEC)DEC.items.forEach(x=>dm[x.i]=x);
+ const selT=DEC?sum(DEC.items.map(x=>x.a))/1e9:0,selL=DEC?sum(items.filter(i=>dm[i.id]).map(i=>i.a))/1e9:0;
+ const rows=items.map(i=>{const d=dm[i.id];return `<tr class="${DEC&&!d?'off':''}"><td>${i.g}</td><td>${i.n}</td><td>${i.w}</td><td>${f(i.a/1e9,2)}</td>${DEC?`<td>${d?`<span class="ok">${d.a<i.a?'کاهش‌یافته':'تایید'}</span>`:'—'}</td><td>${d?f(d.a/1e9,2)+(d.a<i.a?` <span class="cut">(−${f((i.a-d.a)/1e9,2)})</span>`:''):''}</td><td>${d?d.n||'':''}</td>`:''}</tr>`}).join('');
+ const bycat={};if(DEC)items.filter(i=>dm[i.id]).forEach(i=>{bycat[i.c||'نامشخص']=(bycat[i.c||'نامشخص']||0)+dm[i.id].a/1e9});
+ const sumHtml=DEC?`<div class="ins"><div>انتخاب مدیر خرید: ${f(DEC.items.length,0)} ردیف از ${f(items.length,0)} ردیف، جمع ${f(selT,2)} میلیارد ریال</div><div>کاهش نسبت به لیست در ردیف‌های انتخاب‌شده: ${f(selL-selT,2)} میلیارد؛ انتخاب‌نشده: ${f(tot-selL,2)} میلیارد</div>${bal!=null?`<div>مانده بانک ${f(bal,1)} میلیارد ← پس از پرداخت انتخاب‌ها ${f(bal-selT,1)} میلیارد ${bal-selT<0?'(کسری)':''}</div>`:''}<div>ارسال‌شده در ${new Date(DEC.ts).toLocaleDateString('fa-IR-u-ca-persian')} ${new Date(DEC.ts).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'})}</div>${Object.entries(bycat).map(([c,v])=>`<div style="font-weight:400;color:var(--ink)">${c}: ${f(v,2)}</div>`).join('')}</div>`:'<p class="note">هنوز انتخابی از مدیر خرید وارد نشده است.</p>';
+ $('view').innerHTML=`<div class="kpis">${kp(f(tot,1),'جمع لیست '+pd(PY.list)+' (میلیارد ریال)')}${kp(f(items.length,0),'تعداد ردیف')}${kp(bal!=null?f(bal,1):'—','مانده بانک (میلیارد)')}${kp(bal!=null?f(bal-tot,1):'—','مانده پس از پرداخت کامل لیست',bal!=null&&bal-tot<0)}</div>
+ <div class="g12">${P('لیست پرداخت و تصمیم مدیر خرید (میلیارد ریال)',`<table><tr><th>گروه</th><th>طرف مقابل</th><th>بابت</th><th>لیست</th>${DEC?'<th>وضعیت</th><th>مبلغ تایید</th><th>توضیح</th>':''}</tr>${rows}</table>`,'c7 tall')}
+ ${P('دریافت انتخاب مدیر خرید',`<div class="pay"><textarea id="pcode" placeholder="کدی که مدیر خرید فرستاده را اینجا بچسبانید"></textarea><input type="password" id="ppw" placeholder="رمز مدیر خرید" style="margin:8px 0"><button class="reset" id="pgo">نمایش انتخاب</button><div id="pmsg" class="note"></div></div>`,'c5')}
+ ${P('خلاصه تصمیم',sumHtml,'c5')}</div>`;
+ $('pgo').onclick=async()=>{try{DEC=await decodeSel($('pcode').value,$('ppw').value);if(DEC.list!=PY.list){$('pmsg').textContent='این کد مربوط به لیست '+DEC.list+' است، نه لیست فعلی.';return}payTab()}catch(x){$('pmsg').textContent='کد یا رمز درست نیست.'}}}
 </script></body></html>

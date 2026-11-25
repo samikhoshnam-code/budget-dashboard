@@ -31,7 +31,7 @@ input.amt{width:120px;text-align:left}input.note{min-width:120px}
 <input type="password" id="pw" placeholder="رمز عبور" aria-label="رمز عبور" autocomplete="current-password"><div id="err" role="alert"></div><button class="pri" style="width:100%">ورود</button></form></div>
 <header><div><h1>لیست پرداخت – انتخاب مدیر خرید</h1><small id="sub"></small></div><div class="mut" style="color:#fff">برای هر ردیف: تیک بزنید یا مبلغ را کم کنید</div></header>
 <main id="app" hidden>
-<div class="bar"><div><b id="tot">۰</b><span>جمع پرداخت پیشنهادی (میلیارد ریال)</span></div><div><b id="cnt">۰</b><span>تعداد ردیف انتخاب‌شده</span></div><div><b id="cut">۰</b><span>کاهش نسبت به لیست (میلیارد)</span></div>
+<div class="bar"><div><b id="ltot">۰</b><span>جمع لیست (میلیارد ریال)</span></div><div><b id="tot">۰</b><span>جمع پرداخت پیشنهادی شما (میلیارد ریال)</span></div>
 <div style="margin-inline-start:auto;display:flex;gap:8px;flex-wrap:wrap"><button id="all">انتخاب همه</button><button id="none">برداشتن همه</button><button class="pri" id="send">ساخت کد و ارسال</button></div></div>
 <table><thead><tr><th></th><th>گروه</th><th>طرف مقابل</th><th>بابت</th><th>مبلغ لیست (ریال)</th><th>مبلغ پرداخت پیشنهادی (ریال)</th><th>توضیح</th></tr></thead><tbody id="rows"></tbody></table>
 <div id="out" hidden><b>کد انتخاب شما</b><p class="mut">این کد رمزگذاری‌شده است. آن را (کپی یا فایل) برای مدیر مالی بفرستید؛ بدون رمز مدیر خرید خوانده نمی‌شود.</p>
@@ -55,7 +55,7 @@ function draw(){$('rows').innerHTML=P.items.map((it,i)=>{const s=sel[it.id];retu
   tr.querySelector('input[type=checkbox]').onchange=e=>{s.on=e.target.checked;save();draw()};
   tr.querySelector('.amt').onchange=e=>{let v=Math.round(Number(e.target.value)||0);s.a=Math.max(0,Math.min(it.a,v));save();draw()};
   tr.querySelector('.note').onchange=e=>{s.n=e.target.value;save()}});sum()}
-function sum(){let t=0,c=0,l=0;P.items.forEach(it=>{const s=sel[it.id];if(s.on){t+=s.a;c++;l+=it.a}});$('tot').textContent=fb(t);$('cnt').textContent=f(c);$('cut').textContent=fb(l-t)}
+function sum(){let t=0;P.items.forEach(it=>{const s=sel[it.id];if(s.on)t+=s.a});$('tot').textContent=fb(t);$('ltot').textContent=fb(P.items.reduce((x,it)=>x+it.a,0))}
 $('all').onclick=()=>{P.items.forEach(it=>sel[it.id].on=true);save();draw()};$('none').onclick=()=>{P.items.forEach(it=>sel[it.id].on=false);save();draw()};
 $('send').onclick=async()=>{const items=P.items.filter(it=>sel[it.id].on&&sel[it.id].a>0).map(it=>({i:it.id,a:sel[it.id].a,n:sel[it.id].n}));
  if(!items.length){alert('هیچ ردیفی انتخاب نشده است.');return}
