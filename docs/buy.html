@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>لیست پرداخت – مدیر خرید</title>
+<style>
+:root{--bg:#F4F6FA;--card:#fff;--ink:#1F2A44;--mut:#6B7694;--line:#D5DCE8;--nav:#0B4F8A;--kpi:#2F3A8F;--b:#1B4F8A;--o:#FF7F0E;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1626;--card:#18213A;--ink:#E6EBF5;--mut:#9AA6C4;--line:#2B3656;--nav:#0B3A66;--b:#5B9BE0}}
+[hidden]{display:none!important}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",Tahoma,Vazirmatn,sans-serif}
+header{background:var(--nav);color:#fff;padding:12px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header h1{margin:0;font-size:20px}header small{opacity:.85}
+main{padding:14px 22px 90px;max-width:1300px;margin:auto}
+.bar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.bar b{color:var(--b);font-size:18px}.bar span{color:var(--mut);font-size:13px;display:block}
+button{font:inherit;cursor:pointer;border-radius:10px;border:2px solid var(--b);background:transparent;color:var(--b);padding:7px 16px;font-weight:600}
+button.pri{background:var(--kpi);border-color:var(--kpi);color:#fff}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px;vertical-align:middle}th{color:var(--b);background:var(--bg);position:sticky;top:0}
+tr.off td{opacity:.45}td.num{font-variant-numeric:tabular-nums;text-align:left;white-space:nowrap}
+input[type=number],input[type=text],input[type=password],textarea{font:inherit;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--ink);width:100%}
+input.amt{width:120px;text-align:left}input.note{min-width:120px}
+.red{color:var(--o);font-weight:600}.mut{color:var(--mut);font-size:12px}
+#login{position:fixed;inset:0;background:var(--nav);display:flex;align-items:center;justify-content:center;z-index:9}
+#login form{background:var(--card);padding:30px;border-radius:16px;width:min(380px,90vw);text-align:center}
+#err{color:#C0392B;min-height:20px}
+#out{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px}
+#out textarea{height:120px;direction:ltr;font-family:monospace;font-size:12px}
+</style></head><body>
+<div id="login"><form id="lf"><h2 style="margin:0">لیست پرداخت – مدیر خرید</h2><p class="mut">رمز مخصوص مدیر خرید را وارد کنید.</p>
+<input type="password" id="pw" placeholder="رمز عبور" aria-label="رمز عبور" autocomplete="current-password"><div id="err" role="alert"></div><button class="pri" style="width:100%">ورود</button></form></div>
+<header><div><h1>لیست پرداخت – انتخاب مدیر خرید</h1><small id="sub"></small></div><div class="mut" style="color:#fff">برای هر ردیف: تیک بزنید یا مبلغ را کم کنید</div></header>
+<main id="app" hidden>
+<div class="bar"><div><b id="tot">۰</b><span>جمع پرداخت پیشنهادی (میلیارد ریال)</span></div><div><b id="cnt">۰</b><span>تعداد ردیف انتخاب‌شده</span></div><div><b id="cut">۰</b><span>کاهش نسبت به لیست (میلیارد)</span></div>
+<div style="margin-inline-start:auto;display:flex;gap:8px;flex-wrap:wrap"><button id="all">انتخاب همه</button><button id="none">برداشتن همه</button><button class="pri" id="send">ساخت کد و ارسال</button></div></div>
+<table><thead><tr><th></th><th>گروه</th><th>طرف مقابل</th><th>بابت</th><th>مبلغ لیست (ریال)</th><th>مبلغ پرداخت پیشنهادی (ریال)</th><th>توضیح</th></tr></thead><tbody id="rows"></tbody></table>
+<div id="out" hidden><b>کد انتخاب شما</b><p class="mut">این کد رمزگذاری‌شده است. آن را (کپی یا فایل) برای مدیر مالی بفرستید؛ بدون رمز مدیر خرید خوانده نمی‌شود.</p>
+<textarea id="code" readonly></textarea><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button id="copy">کپی کد</button><button id="dl">دانلود فایل</button><button id="share">اشتراک‌گذاری</button></div><div id="msg" class="mut" style="margin-top:6px"></div></div>
+</main>
+<script>
+const $=s=>document.getElementById(s),f=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:0}),fb=n=>Number(n/1e9).toLocaleString('fa-IR',{maximumFractionDigits:2});
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),tb=u=>btoa(String.fromCharCode(...u));
+let P,PW,sel={};
+async function key(pw,salt,it,u){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:it,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,u)}
+async function load(pw){const e=await (await fetch('pay.enc?'+Date.now())).json();const k=await key(pw,b64(e.s),e.it,['decrypt']);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(e.i)},k,b64(e.c))))}
+$('lf').onsubmit=async e=>{e.preventDefault();try{P=await load($('pw').value);PW=$('pw').value}catch(x){$('err').textContent='رمز نادرست است یا لیست در دسترس نیست.';return}
+ $('login').hidden=true;$('app').hidden=false;init()};
+const SK='pay-sel-';
+function init(){$('sub').textContent='لیست '+P.list.replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' – به‌روزرسانی: '+P.updated;
+ try{sel=JSON.parse(localStorage.getItem(SK+P.list)||'{}')}catch(x){sel={}}
+ P.items.forEach(it=>{if(!sel[it.id])sel[it.id]={on:false,a:it.a,n:''}});draw()}
+function save(){try{localStorage.setItem(SK+P.list,JSON.stringify(sel))}catch(x){}}
+function draw(){$('rows').innerHTML=P.items.map((it,i)=>{const s=sel[it.id];return `<tr class="${s.on?'':'off'}" data-i="${i}"><td><input type="checkbox" ${s.on?'checked':''} aria-label="انتخاب"></td><td>${it.g}</td><td>${it.n}</td><td>${it.w}</td><td class="num">${f(it.a)}</td><td><input class="amt" type="number" min="0" max="${it.a}" step="1000000" value="${s.a}" ${s.on?'':'disabled'}><div class="mut ${s.a<it.a?'red':''}">${s.a<it.a?'کاهش '+f(it.a-s.a):''}</div></td><td><input class="note" type="text" value="${s.n.replace(/"/g,'&quot;')}" placeholder="توضیح"></td></tr>`}).join('');
+ document.querySelectorAll('#rows tr').forEach(tr=>{const it=P.items[tr.dataset.i],s=sel[it.id];
+  tr.querySelector('input[type=checkbox]').onchange=e=>{s.on=e.target.checked;save();draw()};
+  tr.querySelector('.amt').onchange=e=>{let v=Math.round(Number(e.target.value)||0);s.a=Math.max(0,Math.min(it.a,v));save();draw()};
+  tr.querySelector('.note').onchange=e=>{s.n=e.target.value;save()}});sum()}
+function sum(){let t=0,c=0,l=0;P.items.forEach(it=>{const s=sel[it.id];if(s.on){t+=s.a;c++;l+=it.a}});$('tot').textContent=fb(t);$('cnt').textContent=f(c);$('cut').textContent=fb(l-t)}
+$('all').onclick=()=>{P.items.forEach(it=>sel[it.id].on=true);save();draw()};$('none').onclick=()=>{P.items.forEach(it=>sel[it.id].on=false);save();draw()};
+$('send').onclick=async()=>{const items=P.items.filter(it=>sel[it.id].on&&sel[it.id].a>0).map(it=>({i:it.id,a:sel[it.id].a,n:sel[it.id].n}));
+ if(!items.length){alert('هیچ ردیفی انتخاب نشده است.');return}
+ const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),it_=200000,k=await key(PW,salt,it_,['encrypt']);
+ const pl={v:1,list:P.list,ts:new Date().toISOString(),items};
+ const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(pl))));
+ const code='PAY1.'+tb(salt)+'.'+tb(iv)+'.'+tb(ct);$('code').value=code;$('out').hidden=false;$('out').scrollIntoView({behavior:'smooth'});$('msg').textContent='کد ساخته شد. '+f(items.length)+' ردیف، جمع '+fb(items.reduce((s,x)=>s+x.a,0))+' میلیارد ریال.'};
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value);$('msg').textContent='کد کپی شد.'}catch(x){$('code').select();document.execCommand('copy');$('msg').textContent='کد کپی شد.'}};
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('code').value],{type:'text/plain'}));a.download='payment-selection-'+P.list.replace(/\//g,'-')+'.txt';a.click()};
+$('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'انتخاب پرداخت',text:$('code').value})}catch(x){}}else $('msg').textContent='در این مرورگر اشتراک‌گذاری نیست؛ کد را کپی کنید یا فایل را دانلود کنید.'};
+</script></body></html>
