@@ -12,7 +12,7 @@ header{background:var(--nav);color:#fff;padding:12px 22px;display:flex;justify-c
 header h1{margin:0;font-size:20px}header small{opacity:.85}
 main{padding:14px 22px 90px;max-width:1300px;margin:auto}
 .bar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.bar b{color:var(--b);font-size:18px}.bar span{color:var(--mut);font-size:13px;display:block}
+.bar b{color:var(--b);font-size:20px}.bar span{color:var(--mut);font-size:13px;display:block}
 button{font:inherit;cursor:pointer;border-radius:10px;border:2px solid var(--b);background:transparent;color:var(--b);padding:7px 16px;font-weight:600}
 button.pri{background:var(--kpi);border-color:var(--kpi);color:#fff}
 table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -26,44 +26,85 @@ input.amt{width:120px;text-align:left}input.note{min-width:120px}
 #err{color:#C0392B;min-height:20px}
 #out{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px}
 #out textarea{height:120px;direction:ltr;font-family:monospace;font-size:12px}
+@page{size:A4 landscape;margin:8mm}
+#ptab{display:none}
+@media print{body{background:#fff;color:#000}header,.bar,#app>table,#out,#login{display:none!important}main{padding:0!important}
+#ptab{display:block}#ptab h2{margin:0 0 4px;font-size:18px}#ptab p{margin:0 0 8px;font-size:12px}#ptab table{width:100%;border-collapse:collapse}
+#ptab th,#ptab td{border:1px solid #777;padding:4px 6px;font-size:12px;text-align:right}#ptab th{background:#e8ecf4}#ptab .num{text-align:left;white-space:nowrap}#ptab .sign{margin-top:26px;font-size:13px;display:flex;justify-content:space-between}}
 </style></head><body>
 <div id="login"><form id="lf"><h2 style="margin:0">لیست پرداخت – مدیر خرید</h2><p class="mut">رمز مخصوص مدیر خرید را وارد کنید.</p>
 <input type="password" id="pw" placeholder="رمز عبور" aria-label="رمز عبور" autocomplete="current-password"><div id="err" role="alert"></div><button class="pri" style="width:100%">ورود</button></form></div>
 <header><div><h1>لیست پرداخت – انتخاب مدیر خرید</h1><small id="sub"></small></div><div class="mut" style="color:#fff">برای هر ردیف: تیک بزنید یا مبلغ را کم کنید</div></header>
 <main id="app" hidden>
-<div class="bar"><div><b id="ltot">۰</b><span>جمع لیست (میلیارد ریال)</span></div><div><b id="tot">۰</b><span>جمع پرداخت پیشنهادی شما (میلیارد ریال)</span></div>
-<div style="margin-inline-start:auto;display:flex;gap:8px;flex-wrap:wrap"><button id="all">انتخاب همه</button><button id="none">برداشتن همه</button><button class="pri" id="send">ساخت کد و ارسال</button></div></div>
-<table><thead><tr><th></th><th>گروه</th><th>طرف مقابل</th><th>بابت</th><th>مبلغ لیست (ریال)</th><th>مبلغ پرداخت پیشنهادی (ریال)</th><th>توضیح</th></tr></thead><tbody id="rows"></tbody></table>
+<div class="bar"><div><b id="ltot">۰</b><span>جمع لیست (ریال)</span></div><div><b id="tot">۰</b><span>جمع پرداخت پیشنهادی شما (ریال)</span></div>
+<div style="margin-inline-start:auto;display:flex;gap:8px;flex-wrap:wrap"><button id="prt">چاپ</button><button id="xl">دانلود اکسل</button><button id="all">انتخاب همه</button><button id="none">برداشتن همه</button><button class="pri" id="send">ساخت کد و ارسال</button></div></div>
+<table><thead><tr><th></th><th>تاریخ</th><th>گروه</th><th>طرف مقابل</th><th>بابت</th><th>مبلغ لیست (ریال)</th><th>مبلغ پرداخت پیشنهادی (ریال)</th><th>توضیح</th></tr></thead><tbody id="rows"></tbody></table>
+<div id="ptab"></div>
 <div id="out" hidden><b>کد انتخاب شما</b><p class="mut">این کد رمزگذاری‌شده است. آن را (کپی یا فایل) برای مدیر مالی بفرستید؛ بدون رمز مدیر خرید خوانده نمی‌شود.</p>
 <textarea id="code" readonly></textarea><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button id="copy">کپی کد</button><button id="dl">دانلود فایل</button><button id="share">اشتراک‌گذاری</button></div><div id="msg" class="mut" style="margin-top:6px"></div></div>
 </main>
 <script>
 const $=s=>document.getElementById(s),f=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:0}),fb=n=>Number(n/1e9).toLocaleString('fa-IR',{maximumFractionDigits:2});
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),tb=u=>btoa(String.fromCharCode(...u));
-let P,PW,sel={};
+let P,PW,VK,sel={};
 async function key(pw,salt,it,u){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:it,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,u)}
 async function load(pw){const e=await (await fetch('pay.enc?'+Date.now())).json();const k=await key(pw,b64(e.s),e.it,['decrypt']);return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(e.i)},k,b64(e.c))))}
 $('lf').onsubmit=async e=>{e.preventDefault();try{P=await load($('pw').value);PW=$('pw').value}catch(x){$('err').textContent='رمز نادرست است یا لیست در دسترس نیست.';return}
  $('login').hidden=true;$('app').hidden=false;init()};
-const SK='pay-sel-';
+const SK='pay-sel3-',h32=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)};
 function init(){$('sub').textContent='لیست '+P.list.replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])+' – به‌روزرسانی: '+P.updated;
- try{sel=JSON.parse(localStorage.getItem(SK+P.list)||'{}')}catch(x){sel={}}
- P.items.forEach(it=>{if(!sel[it.id])sel[it.id]={on:false,a:it.a,n:''}});draw()}
-function save(){try{localStorage.setItem(SK+P.list,JSON.stringify(sel))}catch(x){}}
-function draw(){$('rows').innerHTML=P.items.map((it,i)=>{const s=sel[it.id];return `<tr class="${s.on?'':'off'}" data-i="${i}"><td><input type="checkbox" ${s.on?'checked':''} aria-label="انتخاب"></td><td>${it.g}</td><td>${it.n}</td><td>${it.w}</td><td class="num">${f(it.a)}</td><td><input class="amt" type="number" min="0" max="${it.a}" step="1000000" value="${s.a}" ${s.on?'':'disabled'}><div class="mut ${s.a<it.a?'red':''}">${s.a<it.a?'کاهش '+f(it.a-s.a):''}</div></td><td><input class="note" type="text" value="${s.n.replace(/"/g,'&quot;')}" placeholder="توضیح"></td></tr>`}).join('');
+ VK=SK+P.list+'-'+h32(P.items.map(i=>i.id+':'+i.a).join('|'));try{sel=JSON.parse(localStorage.getItem(VK)||'{}')}catch(x){sel={}}
+ P.items.forEach(it=>{const s=sel[it.id];if(!s||typeof s.a!='number'||s.a>it.a)sel[it.id]={on:false,a:it.a,n:''}});draw()}
+function save(){try{localStorage.setItem(VK,JSON.stringify(sel))}catch(x){}}
+function draw(){$('rows').innerHTML=P.items.map((it,i)=>{const s=sel[it.id];return `<tr class="${s.on?'':'off'}" data-i="${i}"><td><input type="checkbox" ${s.on?'checked':''} aria-label="انتخاب"></td><td class="num">${(it.od||P.list).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}</td><td>${it.g}</td><td>${it.n}</td><td>${it.w}</td><td class="num">${f(it.a)}</td><td><input class="amt" type="number" min="0" max="${it.a}" step="1000000" value="${s.a}" ${s.on?'':'disabled'}><div class="mut ${s.a<it.a?'red':''}">${s.a<it.a?'کاهش '+f(it.a-s.a):''}</div></td><td><input class="note" type="text" value="${s.n.replace(/"/g,'&quot;')}" placeholder="توضیح"></td></tr>`}).join('');
  document.querySelectorAll('#rows tr').forEach(tr=>{const it=P.items[tr.dataset.i],s=sel[it.id];
   tr.querySelector('input[type=checkbox]').onchange=e=>{s.on=e.target.checked;save();draw()};
   tr.querySelector('.amt').onchange=e=>{let v=Math.round(Number(e.target.value)||0);s.a=Math.max(0,Math.min(it.a,v));save();draw()};
   tr.querySelector('.note').onchange=e=>{s.n=e.target.value;save()}});sum()}
-function sum(){let t=0;P.items.forEach(it=>{const s=sel[it.id];if(s.on)t+=s.a});$('tot').textContent=fb(t);$('ltot').textContent=fb(P.items.reduce((x,it)=>x+it.a,0))}
+function sum(){let t=0;P.items.forEach(it=>{const s=sel[it.id];if(s.on)t+=s.a});$('tot').textContent=f(t);$('ltot').textContent=f(P.items.reduce((x,it)=>x+it.a,0))}
 $('all').onclick=()=>{P.items.forEach(it=>sel[it.id].on=true);save();draw()};$('none').onclick=()=>{P.items.forEach(it=>sel[it.id].on=false);save();draw()};
 $('send').onclick=async()=>{const items=P.items.filter(it=>sel[it.id].on&&sel[it.id].a>0).map(it=>({i:it.id,a:sel[it.id].a,n:sel[it.id].n}));
  if(!items.length){alert('هیچ ردیفی انتخاب نشده است.');return}
  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),it_=200000,k=await key(PW,salt,it_,['encrypt']);
  const pl={v:1,list:P.list,ts:new Date().toISOString(),items};
  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(pl))));
- const code='PAY1.'+tb(salt)+'.'+tb(iv)+'.'+tb(ct);$('code').value=code;$('out').hidden=false;$('out').scrollIntoView({behavior:'smooth'});$('msg').textContent='کد ساخته شد. '+f(items.length)+' ردیف، جمع '+fb(items.reduce((s,x)=>s+x.a,0))+' میلیارد ریال.'};
+ const code='PAY1.'+tb(salt)+'.'+tb(iv)+'.'+tb(ct);$('code').value=code;$('out').hidden=false;$('out').scrollIntoView({behavior:'smooth'});$('msg').textContent='کد ساخته شد. '+f(items.length)+' ردیف، جمع '+f(items.reduce((s,x)=>s+x.a,0))+' ریال.'};
 $('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('code').value);$('msg').textContent='کد کپی شد.'}catch(x){$('code').select();document.execCommand('copy');$('msg').textContent='کد کپی شد.'}};
 $('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('code').value],{type:'text/plain'}));a.download='payment-selection-'+P.list.replace(/\//g,'-')+'.txt';a.click()};
 $('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'انتخاب پرداخت',text:$('code').value})}catch(x){}}else $('msg').textContent='در این مرورگر اشتراک‌گذاری نیست؛ کد را کپی کنید یا فایل را دانلود کنید.'};
+
+/* مولد ساده xlsx (بدون کتابخانه): rows = آرایه‌ای از آرایه‌ها؛ عدد = ستون عددی؛ bold = شماره ردیف‌های پررنگ؛ widths = عرض ستون‌ها */
+const CRCT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipStore(files){const te=new TextEncoder(),parts=[],cd=[];let off=0;
+ for(const [name,content] of Object.entries(files)){const nb=te.encode(name),d=te.encode(content),crc=crc32(d);
+  const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(8,0,true);h.setUint16(10,0,true);h.setUint16(12,0x21,true);h.setUint32(14,crc,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nb.length,true);h.setUint16(28,0,true);
+  parts.push(new Uint8Array(h.buffer),nb,d);
+  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(10,0,true);c.setUint16(12,0,true);c.setUint16(14,0x21,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nb.length,true);c.setUint32(42,off,true);
+  cd.push(new Uint8Array(c.buffer),nb);off+=30+nb.length+d.length}
+ const cdl=cd.reduce((s,x)=>s+x.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,Object.keys(files).length,true);e.setUint16(10,Object.keys(files).length,true);e.setUint32(12,cdl,true);e.setUint32(16,off,true);
+ const all=[...parts,...cd,new Uint8Array(e.buffer)],out=new Uint8Array(all.reduce((s,x)=>s+x.length,0));let p=0;all.forEach(x=>{out.set(x,p);p+=x.length});return out}
+function xlsxBytes(rows,o={}){const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])),bold=new Set(o.bold||[0]);
+ const col=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s};
+ const sd=rows.map((r,ri)=>`<row r="${ri+1}">`+r.map((v,ci)=>{if(v===null||v===undefined||v==='')return '';const ref=col(ci)+(ri+1),b=bold.has(ri);
+  return typeof v==='number'?`<c r="${ref}" s="${b?3:2}"><v>${v}</v></c>`:`<c r="${ref}" t="inlineStr" s="${b?1:0}"><is><t xml:space="preserve">${esc(v)}</t></is></c>`}).join('')+'</row>').join('');
+ const cols=(o.widths||[]).map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('');
+ const NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"',X='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+ return zipStore({'[Content_Types].xml':X+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>',
+  '_rels/.rels':X+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+  'xl/workbook.xml':X+`<workbook ${NS} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${esc(o.name||'Sheet1').slice(0,31)}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+  'xl/_rels/workbook.xml.rels':X+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
+  'xl/styles.xml':X+`<styleSheet ${NS}><numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><sz val="11"/><name val="Arial"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1"/></cellXfs></styleSheet>`,
+  'xl/worksheets/sheet1.xml':X+`<worksheet ${NS}><sheetViews><sheetView rightToLeft="1" workbookViewId="0"/></sheetViews><cols>${cols}</cols><sheetData>${sd}</sheetData></worksheet>`})}
+function dlFile(u8,name,mime){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([u8],{type:mime||'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+const pdg=t=>String(t).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+function buyRows(){return P.items.map((it,i)=>{const s=sel[it.id],on=s.on&&s.a>0;return[i+1,it.od||P.list,it.g,it.n,it.w,it.a,on?'بله':'خیر',on?s.a:'',s.n||'']})}
+function buyTotals(){const r=buyRows();return[P.items.reduce((x,i)=>x+i.a,0),r.reduce((x,y)=>x+(typeof y[7]=='number'?y[7]:0),0)]}
+function buyXlsx(){const H=['ردیف','تاریخ دستور','گروه','طرف مقابل','بابت','مبلغ لیست (ریال)','انتخاب','مبلغ پیشنهادی (ریال)','توضیح'],r=buyRows(),t=buyTotals();
+ return xlsxBytes([H].concat(r,[[],['','','','','جمع لیست',t[0],'',t[1],'']]),{bold:[0,r.length+2],widths:[7,12,10,34,40,18,8,20,24],name:'لیست پرداخت'})}
+$('xl').onclick=()=>dlFile(buyXlsx(),'purchase-list-'+P.list.replace(/\//g,'-')+'.xlsx');
+$('prt').onclick=()=>{const r=buyRows(),t=buyTotals(),fm=n=>f(n);
+ $('ptab').innerHTML=`<h2>لیست پرداخت – مدیر خرید – تاریخ لیست ${pdg(P.list)}</h2><p>تاریخ چاپ: ${new Date().toLocaleDateString('fa-IR-u-ca-persian')} – جمع لیست: ${fm(t[0])} ریال – جمع پیشنهادی: ${fm(t[1])} ریال</p><table><tr><th>ردیف</th><th>تاریخ</th><th>طرف مقابل</th><th>بابت</th><th>مبلغ لیست (ریال)</th><th>انتخاب</th><th>مبلغ پیشنهادی (ریال)</th><th>توضیح</th></tr>${r.map(x=>`<tr><td>${pdg(x[0])}</td><td>${pdg(x[1])}</td><td>${x[3]}</td><td>${x[4]}</td><td class="num">${fm(x[5])}</td><td>${x[6]}</td><td class="num">${x[7]===''?'':fm(x[7])}</td><td>${x[8]}</td></tr>`).join('')}<tr><th colspan="4">جمع</th><th class="num">${fm(t[0])}</th><th></th><th class="num">${fm(t[1])}</th><th></th></tr></table><div class="sign"><span>امضای مدیر خرید: ..............................</span><span>تاریخ: ..............................</span></div>`;
+ window.print()};
 </script></body></html>
