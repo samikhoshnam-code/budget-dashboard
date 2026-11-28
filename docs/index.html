@@ -124,7 +124,8 @@ function draw(){const M=D.months[mk],all=M.cats;
  for(let d=1;d<=ld;d++){const m=M.daily[d]||{};cum+=sel?(m[sel]||0):Object.values(m).reduce((a,b)=>a+b,0);pts.push(cum)}
  const tq=Math.max(cum,A,1)*1.08,xs=i=>14+i*(420/29),ys=v=>212-v/tq*190;
  const big=[...all].sort((a,b)=>b.x-a.x)[0],ov=[...all].sort((a,b)=>(b.x-b.a)-(a.x-a.a))[0],pa=all.filter(c=>c.a>0).sort((a,b)=>a.x/a.a-b.x/b.a)[0];
- $('view').innerHTML=`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp(f(R),'مانده بودجه',R<0)}</div>
+ const noBud=all.every(c=>!c.a&&!c.q);
+ $('view').innerHTML=(noBud?'<div class="note" style="flex:none;background:var(--card);border:1px solid var(--o);border-radius:10px;padding:8px;margin:0;color:var(--o)">بودجه این ماه در فایل اکسل خوانده نشد؛ شیت «گزارش '+M.label.split(' ')[0]+' '+M.label.split(' ')[1]+'» را (کپی شیت آبان) اضافه کنید و بودجه را بنویسید.</div>':'')+`<div class="kpis">${kp(f(A,0),'بودجه تخصیص‌یافته')}${kp(f(X),'عملکرد (جذب‌شده)')}${kp(f(R),'مانده بودجه',R<0)}</div>
  <div class="g12">${P('مقایسه ماهانه با ماه قبل (میلیارد ریال)',`<div class="hb">${bars}</div>`,'c4',leg([[PM?PM.label:'ماه قبل','var(--q)'],[M.label+(e1&&e1<(Number(mk.slice(5,7))<=6?31:30)?' (تا روز '+pd(e1)+')':''),'var(--b)'],['بیش از ۱۰٪ افزایش','var(--o)']]))}
  ${P('مقایسه بودجه درخواستی و جذب‌شده (میلیارد ریال)',vert,'c5',leg([['درخواستی','var(--q)'],['جذب شده','var(--b)'],['جذب‌شده بالاتر از درخواستی','var(--o)']]))}
  ${P('مانده بودجه هر دسته (میلیارد ریال)',balp,'c3')}
